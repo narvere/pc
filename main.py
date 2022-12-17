@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Entry, Button, END, Frame, Text, LabelFrame
+from tkinter import Tk, Label, Entry, Button, END, Text, LabelFrame
 from pass_gen import pass_gen, eesti_speller
 
 root = Tk()
@@ -17,9 +17,6 @@ zimbra = "Zimbra: "
 zimbra_pass = "Zimbra pass: "
 text_width = 50
 text_height = 10
-
-
-
 
 
 def get_text():
@@ -50,6 +47,7 @@ def get_text():
     textSMS.insert(index=4.0, chars=ester_pass + heda_pass + '\n')
     textSMS.insert(index=5.0, chars=zimbra + name.lower() + "." + surname.lower() + '\n')
     textSMS.insert(index=6.0, chars=zimbra_pass + password + '\n')
+
 
 # xxx = f"{nimi} + {name} + " " + surname + '\n'"
 # Button(text='age', command=lambda: gtc(xxx)).grid(column=2, row=8)
@@ -107,8 +105,6 @@ textSMS.grid(row=8, column=0, columnspan=2)
 def gtc(dtxt):
     root.clipboard_clear()
     root.clipboard_append(dtxt)
-
-
 
 
 root.mainloop()
