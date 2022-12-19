@@ -1,9 +1,11 @@
 from tkinter import Tk, END, Text
-from tkinter.ttk import Label, Entry, Button, LabelFrame
+from tkinter.ttk import Label, Entry, Button, LabelFrame, Frame
+
 from pass_gen import pass_gen, eesti_speller
+from good import send_mail
 
 root = Tk()
-root.geometry("700x500+700+300")
+root.geometry("800x530+700+300")
 root.resizable(width=False, height=False)
 root.title("Narva Haigla tool by Deniss Hohlov")
 nimi = "Nimi: "
@@ -73,29 +75,40 @@ def get_text():
 
 Button(text='Copy to Alex', command=lambda: gtc(clipboard_text)).grid(column=2, row=8, ipadx=10, ipady=5)
 Button(text='Copy to SMS', command=lambda: gtc(clipboard_SMS)).grid(column=2, row=9, ipadx=10, ipady=5)
+Button(text='Send to Alex', command=lambda: send_mail('deniss.hohlov@narvahaigla.ee', clipboard_text)).grid(column=3,
+                                                                                                            row=7,
+                                                                                                            ipadx=10,
+                                                                                                            ipady=5)
+Button(text='Send to SMS', command=lambda: send_mail('deniss.hohlov@narvahaigla.ee', clipboard_text)).grid(column=3,
+                                                                                                           row=8,
+                                                                                                           ipadx=10,
+                                                                                                           ipady=5)
 
 frame = LabelFrame(root, text="To Alex")
 frame.grid(row=8, column=0, columnspan=2, pady=5, padx=20)
 frameSMS = LabelFrame(root, text="SMS")
 frameSMS.grid(row=9, column=0, columnspan=2)
 
-name_lb = Label(root, text=nimi)
-surname_lb = Label(root, text=perekonnanimi)
-ester_lb = Label(root, text=ester)
-ik_lb = Label(root, text=ik)
-tel_lb = Label(root, text=tel)
-info_lb = Label(root, text=info)
-name_print = Label(root)
+first_fr = Frame(root)
+first_fr.grid(row=0, column=0)
 
-name_ent = Entry(root)
+name_lb = Label(first_fr, text=nimi)
+surname_lb = Label(first_fr, text=perekonnanimi)
+ester_lb = Label(first_fr, text=ester)
+ik_lb = Label(first_fr, text=ik)
+tel_lb = Label(first_fr, text=tel)
+info_lb = Label(first_fr, text=info)
+name_print = Label(first_fr)
+
+name_ent = Entry(first_fr)
 name_ent.icursor(5)
 name_ent.focus()
 
-surname_ent = Entry(root)
-ester_ent = Entry(root)
-ik_ent = Entry(root)
-tel_ent = Entry(root)
-info_ent = Entry(root)
+surname_ent = Entry(first_fr)
+ester_ent = Entry(first_fr)
+ik_ent = Entry(first_fr)
+tel_ent = Entry(first_fr)
+info_ent = Entry(first_fr)
 alex_ent = Entry(root, width=30)
 alex_ent.insert(END, 'deniss.hohlov@gmail.com')
 sergei_ent = Entry(root, width=30)
