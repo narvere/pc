@@ -133,7 +133,7 @@ txt_textSMS = Text(fr_frameSMS, width=text_width, height=6)
 Создание экземпляра Entry 
 """
 ent_name = Entry(fr_first)
-ent_name.icursor(5)
+# ent_name.icursor(5)
 ent_name.focus()
 
 ent_surname = Entry(fr_first)
