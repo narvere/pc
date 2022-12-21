@@ -3,6 +3,15 @@ from email.message import EmailMessage
 import ssl
 import smtplib
 import dotenv
+import tkinter.messagebox as messagebox
+
+
+def show_info():
+    messagebox.showinfo("Info", "Письмо успешно отправлено!")
+
+
+def show_error(ex):
+    messagebox.showerror("Error", ex)
 
 
 def send_mail(email_receiver, clipboard_text):
@@ -20,10 +29,17 @@ def send_mail(email_receiver, clipboard_text):
     em.set_content(body)
     context = ssl.create_default_context()
     print("Start1!")
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
-        smtp.login(email_sender, email_password)
-        smtp.sendmail(email_sender, email_receiver, em.as_string())
-        print("Start2!")
-
+    # with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+    #     smtp.login(email_sender, email_password)
+    #     smtp.sendmail(email_sender, email_receiver, em.as_string())
+    #     print("Start2!")
+    try:
+        with smtplib.SMTP_SSL('mail.narvahaigla.ee', 465, context=context) as smtp:
+            # print(email_sender, email_password)
+            smtp.login(email_sender, email_password)
+            smtp.sendmail(email_sender, email_receiver, em.as_string())
+            show_info()
+    except Exception as ex:
+        show_error(ex)
 
 # send_mail('deniss.hohlov@gmail.com')
