@@ -1,4 +1,4 @@
-string = "hello1"
+string = "sdfsdf"
 
 if string.isalpha():
     print("The string contains only letters")
