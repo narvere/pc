@@ -8,6 +8,12 @@ root = Tk()
 root.geometry("630x600+700+300")
 root.resizable(width=False, height=False)
 root.title("Narva Haigla tool by Deniss Hohlov")
+
+# Mailing and SMS configurations
+mail_to_alex = "alexey.bystrov@narvahaigla.ee"
+mail_to_sms = "deniss.hohlov@narvahaigla.ee"
+
+# Constants for input fields
 nimi = "Nimi: "
 perekonnanimi = "Perekonnanimi: "
 ester = "Ester login: "
@@ -22,33 +28,46 @@ zimbra = "Zimbra: "
 zimbra_pass = "Zimbra pass: "
 text_width = 50
 text_height = 11
-# mail_to_alex = "deniss.hohlov@narvahaigla.ee"
-mail_to_alex = "alexey.bystrov@narvahaigla.ee"
-mail_to_sms = "deniss.hohlov@narvahaigla.ee"
 ent_len = 40
 
 
+# Validation functions
+def is_alpha(string):
+    return string.isalpha()
+
+
+def is_numeric(string):
+    return string.isnumeric() and len(string) == 11
+
+
+def is_alnum(string):
+    return string.isalnum()
+
+
+def is_empty(string):
+    return bool(string)
+
+
 def string_check(string):
-    if not string.isalpha():
+    if not is_alpha(string.strip()):
         messagebox.showerror("Error", f"{nimi}или {perekonnanimi}- cодержат ошибку!")
         return 0
 
 
 def numeric_check(string):
-    if not string.isnumeric() or len(string) != 11:
-        print(string)
+    if not is_numeric(string):
         messagebox.showerror("Error", f"{ik}- cодержит ошибку!")
         return 0
 
 
 def login_tht_check(string):
-    if not string.isalnum():
+    if not is_alnum(string):
         messagebox.showerror("Error", f"{ester}или {tht}- cодержат ошибку!")
         return 0
 
 
 def checking_emty_string(string):
-    if not bool(string):
+    if not is_empty(string):
         messagebox.showerror("Error", f"{info}или {tel}- пустые!")
         return 0
 
@@ -68,7 +87,7 @@ def del_text(*event):
 def get_text(*event):
     if string_check(ent_name.get()) != 0 or string_check(ent_surname.get()) != 0:
         if numeric_check(ent_ik.get()) != 0:
-            if login_tht_check(ent_ester.get()) != 0 and login_tht_check(ent_tht_kood.get()) != 0:
+            if login_tht_check(ent_ester.get()) != 0:
                 if checking_emty_string(ent_info.get()) != 0 and checking_emty_string(ent_tel.get()) != 0:
                     global clipboard_text, clipboard_SMS
                     dc_pass, heda_pass, password = pass_gen()
@@ -127,34 +146,39 @@ root.bind('<Control-d>', del_text)
 """
 Создание экземпляра Frame и LabelFrame 
 """
-fr_frame = LabelFrame(root, text="To Alex", bg='grey')
-fr_frameSMS = LabelFrame(root, text="SMS", bg='yellow')
-fr_left = Frame(root, bg='green')
-fr_right = Frame(root, bg='black')
+fr_frame_alex = LabelFrame(root, text="To Alex", bg='grey')
+fr_frame_sms = LabelFrame(root, text="SMS", bg='yellow')
+fr_left_entries = Frame(root, bg='green')
+fr_right_setup = Frame(root, bg='green')
+
+
 def open_new_window():
     # Create the new window
     new_window = Toplevel(root)
+    new_window.geometry("250x250")
 
     # Create a label widget and add it to the new window
     label = Label(new_window, text='This is a new window')
     label.pack()
+
+
 """
 Создание экземпляра Butoon 
 """
-btn_setup = Button(fr_right, text="Setup", command=open_new_window)
-btn_cta = Button(fr_frame, text='Copy to Alex', command=lambda: gtc(clipboard_text))
-btn_cts = Button(fr_frameSMS, text='Copy to SMS', command=lambda: gtc(clipboard_SMS))
+btn_setup = Button(fr_right_setup, text="Setup", command=open_new_window)
+btn_cta = Button(fr_frame_alex, text='Copy to Alex', command=lambda: gtc(clipboard_text))
+btn_cts = Button(fr_frame_sms, text='Copy to SMS', command=lambda: gtc(clipboard_SMS))
 
-btn_sta = Button(fr_frame, text='Send to Alex',
+btn_sta = Button(fr_frame_alex, text='Send to Alex',
                  command=lambda: send_mail(mail_to_alex, clipboard_text))
-btn_sts = Button(fr_frameSMS, text='Send to SMS',
+btn_sts = Button(fr_frame_sms, text='Send to SMS',
                  command=lambda: send_mail(mail_to_sms, clipboard_text))
 # except Exception as ex:
 #     show_error(ex)
 
-btn_enter = Button(fr_left, text="Enter", command=get_text, underline=0)
+btn_enter = Button(fr_left_entries, text="Enter", command=get_text, underline=0)
 
-btn_delete = Button(fr_left, text="Delete all", command=del_text, underline=0)
+btn_delete = Button(fr_left_entries, text="Delete all", command=del_text, underline=0)
 style = Style()
 style.map('TButton',
           foreground=[('!active', 'purple'),
@@ -170,44 +194,44 @@ style.map('TButton',
 """
 Создание экземпляра Label 
 """
-lb_name = Label(fr_left, text=nimi, width=12, anchor="w")
-lb_surname = Label(fr_left, text=perekonnanimi, width=12, anchor="w")
-lb_ester = Label(fr_left, text=ester, width=12, anchor="w")
-lb_ik = Label(fr_left, text=ik, width=12, anchor="w")
-lb_tel = Label(fr_left, text=tel, width=12, anchor="w")
-lb_info = Label(fr_left, text=info, width=12, anchor="w")
-lb_tht_kood = Label(fr_left, text=tht, width=12, anchor="w")
-lb_name_print = Label(fr_left)
+lb_name = Label(fr_left_entries, text=nimi, width=12, anchor="w")
+lb_surname = Label(fr_left_entries, text=perekonnanimi, width=12, anchor="w")
+lb_ester = Label(fr_left_entries, text=ester, width=12, anchor="w")
+lb_ik = Label(fr_left_entries, text=ik, width=12, anchor="w")
+lb_tel = Label(fr_left_entries, text=tel, width=12, anchor="w")
+lb_info = Label(fr_left_entries, text=info, width=12, anchor="w")
+lb_tht_kood = Label(fr_left_entries, text=tht, width=12, anchor="w")
+# lb_name_print = Label(fr_left)
 
 """
 Создание экземпляра Text 
 """
-txt_text = Text(fr_frame, width=text_width, height=text_height)
-txt_textSMS = Text(fr_frameSMS, width=text_width, height=6)
+txt_text = Text(fr_frame_alex, width=text_width, height=text_height)
+txt_textSMS = Text(fr_frame_sms, width=text_width, height=6)
 
 """
 Создание экземпляра Entry 
 """
-ent_name = Entry(fr_left)
+ent_name = Entry(fr_left_entries)
 # ent_name.icursor(5)
 ent_name.focus()
-ent_surname = Entry(fr_left)
-ent_ester = Entry(fr_left)
-ent_ik = Entry(fr_left)
-ent_tht_kood = Entry(fr_left)
-ent_tel = Entry(fr_left)
-ent_info = Entry(fr_left)
-ent_alex = Entry(fr_frame, width=30)
+ent_surname = Entry(fr_left_entries)
+ent_ester = Entry(fr_left_entries)
+ent_ik = Entry(fr_left_entries)
+ent_tht_kood = Entry(fr_left_entries)
+ent_tel = Entry(fr_left_entries)
+ent_info = Entry(fr_left_entries)
+ent_alex = Entry(fr_frame_alex, width=30)
 ent_alex.insert(END, 'deniss.hohlov@gmail.com')
-ent_SMS = Entry(fr_frameSMS, width=30)
+ent_SMS = Entry(fr_frame_sms, width=30)
 ent_SMS.insert(END, 'deniss.hohlov@gmail.com')
 
-lb_name_print.grid(row=9, column=3)
+# lb_name_print.grid(row=9, column=3)
 
 """
 Left frame
 """
-fr_left.grid(row=0, column=0, columnspan=3, sticky="w", pady=10)
+fr_left_entries.grid(row=0, column=0, columnspan=3, sticky="w", pady=10, padx=10)
 
 lb_name.grid(row=0, column=0, padx=10, pady=2)
 lb_surname.grid(row=1, column=0, pady=2)
@@ -231,14 +255,13 @@ btn_delete.grid(row=0, column=2, padx=10)
 """
 Right frame
 """
-fr_right.grid(row=0, column=2)
+fr_right_setup.grid(row=0, column=2)
 btn_setup.grid(row=0, column=0)
-
 
 """
 To Alex
 """
-fr_frame.grid(row=4, column=0, columnspan=3, padx=10)
+fr_frame_alex.grid(row=4, column=0, columnspan=3, padx=10)
 txt_text.grid(row=0, column=0, rowspan=11)
 btn_sta.grid(row=0, column=1, ipadx=10, ipady=5, sticky="n")
 btn_cta.grid(row=1, column=1, ipadx=10, ipady=5, sticky="n")
@@ -247,7 +270,7 @@ ent_alex.grid(row=2, column=1, sticky="n", padx=10)
 """
 SMS frame content
 """
-fr_frameSMS.grid(row=9, column=0, columnspan=3)
+fr_frame_sms.grid(row=9, column=0, columnspan=3, pady=10)
 txt_textSMS.grid(row=0, column=0, rowspan=6)
 btn_sts.grid(row=0, column=1, ipadx=10, ipady=5)
 btn_cts.grid(row=1, column=1, ipadx=10, ipady=5)
