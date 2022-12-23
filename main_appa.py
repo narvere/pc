@@ -245,17 +245,23 @@ def open_new_window():
         # printing()
         # print(entry_to_database.get())
 
-    def printing():
-        checking_emty_string2(entry_to_database.get())
+    def process_inputs():
+        entry_string = entry_to_database.get()
+        if not is_empty(entry_string):
+            raise ValueError("String is empty")
 
-        if any([checkbox1_var.get(), checkbox2_var.get()]):
-            print(entry_to_database.get(), checkbox1_var.get(), checkbox2_var.get())
-        else:
-            messagebox.showerror("Error пустые!", "Error пустые!")
-
+        checkbox1_state = checkbox1_var.get()
+        checkbox2_state = checkbox2_var.get()
+        if not any([checkbox1_state, checkbox2_state]):
+            raise ValueError("No checkboxes selected")
+        label_add_mail = Label(new_window, text=f"{entry_string}, {checkbox1_state}, {checkbox2_state}")
+        label_add_mail.grid(row=1, column=0, sticky="w")
+        entry_to_database.delete(0, END)
+        checkbox1.deselect()
+        print(entry_string, checkbox1_state, checkbox2_state)
 
     # Create Add button
-    button_add = Button(new_window, text="Add", command=printing)
+    button_add = Button(new_window, text="Add", command=process_inputs)
 
     # Create a label widget and add it to the new window
 
