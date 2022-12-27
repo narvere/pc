@@ -6,7 +6,7 @@ from variables import label_first_name, label_last_name, label_personal_id, labe
 
 # Validation functions
 
-def is_alpha(string):
+def is_alpha(string: str):
     """
     The function checks if the string is literal characters.
     :param string: The string to validate entered by the user.
@@ -15,7 +15,7 @@ def is_alpha(string):
     return string.isalpha()
 
 
-def is_numeric(string):
+def is_numeric(string: str):
     """
     The function checks if the string is numeric characters.
     :param string: The string to validate entered by the user.
@@ -24,7 +24,7 @@ def is_numeric(string):
     return string.isnumeric() and len(string) == 11
 
 
-def is_alnum(string):
+def is_alnum(string: str):
     """
     The function checks if all the characters are alphanumeric, meaning alphabet letter (a-z) and numbers (0-9).
     :param string: The string to validate entered by the user
@@ -33,7 +33,7 @@ def is_alnum(string):
     return string.isalnum()
 
 
-def is_empty(string):
+def is_empty(string: str):
     """
     The function checks if the string is empty
     :param string: The string to validate entered by the user
@@ -42,7 +42,7 @@ def is_empty(string):
     return bool(string)
 
 
-def string_check(string):
+def string_check(string: str):
     """
     Checking variables label_first_name and label_last_name
     :param string: The string to validate entered by the user
@@ -53,7 +53,7 @@ def string_check(string):
         return 0
 
 
-def numeric_check(string):
+def numeric_check(string: str):
     """
     Checking variables label_personal_id
     :param string: The string to validate entered by the user
@@ -64,7 +64,7 @@ def numeric_check(string):
         return 0
 
 
-def login_tht_check(string):
+def login_tht_check(string: str):
     """
     Checking variables label_ester_login and label_tht_code
     :param string: The string to validate entered by the user
@@ -75,7 +75,7 @@ def login_tht_check(string):
         return 0
 
 
-def checking_emty_string(string):
+def checking_emty_string(string: str):
     """
     Checking variables label_additional_info and label_phone_number
     :param string: The string to validate entered by the user

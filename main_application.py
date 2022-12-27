@@ -4,7 +4,7 @@ from tkinter.ttk import Entry, Button, Style
 import variables
 from pass_generator import pass_gen, eesti_speller
 from mail_engine import send_mail
-import tkinter.messagebox as messagebox
+# import tkinter.messagebox as messagebox
 
 from validators import is_empty, string_check, numeric_check, login_tht_check, checking_emty_string
 from variables import mail_to_alex, mail_to_sms, label_first_name, label_last_name, \
@@ -16,6 +16,14 @@ root = Tk()
 root.geometry("630x600+700+300")
 root.resizable(width=False, height=False)
 root.title("Narva Haigla tool by Deniss Hohlov")
+
+"""
+Создание экземпляра Frame и LabelFrame 
+"""
+frame_alex = LabelFrame(root, text="To Alex")
+frame_sms = LabelFrame(root, text="SMS")
+frame_left_entries = Frame(root)
+frame_right_setup = Frame(root)
 
 
 # Mailing and SMS configurations
@@ -51,10 +59,10 @@ def del_text(*event):
     entry_info.delete(0, END)
 
 
-def get_text(*event):
+def creating_user_text(*event):
     """
-
-    :param event:
+    Getting validated user text, sending to clipboard, keepass and SMS functions
+    :param event: event method is using for hot keys
     :return:
     """
     if not string_check(entry_name.get()) \
@@ -74,17 +82,23 @@ def get_text(*event):
 
 
 def clipboard_adding():
+    """
+    Text generation for clipboard saving
+    :return:
+    """
     additional_info, ester_login, ester_pass, first_name, first_name_speller, last_name_speller, \
         last_surname, pc_login, pc_pass, personal_id, phone_number, tht_code, zimbra_mail, \
         zimbra_pass, zimbra_mail_sms = generate_message_variables()
     # Save to clipboard SMS text
-    variables.clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}{ester_login}\n" \
+    variables.clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}" \
+                                  f"{ester_login}\n" \
                                   f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail_sms}\n" \
                                   f"{label_zimbra_pass}{zimbra_pass} "
     # Save to clipboard KeePass text
     variables.clipboard_keepass_text = f"{label_first_name}{first_name} {last_surname} / {first_name_speller} " \
                                        f"{last_name_speller} " \
-                                       f"\n{variables.clipboard_SMS_txt}\n{label_personal_id}{personal_id}\n{label_tht_code}{tht_code}\n" \
+                                       f"\n{variables.clipboard_SMS_txt}\n{label_personal_id}{personal_id}\n" \
+                                       f"{label_tht_code}{tht_code}\n" \
                                        f"{label_phone_number}{phone_number}\n{label_additional_info}{additional_info}"
     return ester_pass, first_name, first_name_speller, last_name_speller, \
         last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass
@@ -92,13 +106,13 @@ def clipboard_adding():
 
 def print_sms_method(ester_pass, first_name_spelling, last_name_spelling, pc_login, pc_pass, zimbra_pass):
     """
-
-    :param ester_pass:
-    :param first_name_spelling:
-    :param last_name_spelling:
-    :param pc_login:
-    :param pc_pass:
-    :param zimbra_pass:
+    Creating an SMS message sending
+    :param ester_pass: HEDA/ester password
+    :param first_name_spelling: user first name
+    :param last_name_spelling: user last name
+    :param pc_login: user PC login
+    :param pc_pass: user PC password
+    :param zimbra_pass: user Zimbra mail pass
     :return:
     """
     # Clear txt_textSMS widget
@@ -124,7 +138,7 @@ def print_keepass_method(ester_pass, first_name, first_name_spelling, last_name_
                          pc_pass,
                          zimbra_mail, zimbra_pass):
     """
-
+    Creating a message for KeePass sending
     :param ester_pass:
     :param first_name:
     :param first_name_spelling:
@@ -167,8 +181,8 @@ def print_keepass_method(ester_pass, first_name, first_name_spelling, last_name_
 
 def generate_message_variables():
     """
-
-    :return:
+    Generating variables for messages from input user text
+    :return: variabless for messages
     """
     # Generate passwords
     pc_pass, ester_pass, zimbra_pass = pass_gen()
@@ -209,35 +223,31 @@ def generate_message_variables():
         tht_code, zimbra_mail, zimbra_pass, zimbra_mail_sms
 
 
-def show_error(ex):
+# def show_error(ex):
+#     """
+#     Show message box as Exeption
+#     :param ex:
+#     :return:
+#     """
+#     messagebox.showerror("Error", ex)
+
+
+def creating_hotkeys():
     """
-
-    :param ex:
-    :return:
+    Создание горячих клавиш
     """
-    messagebox.showerror("Error", ex)
+    root.bind('<Control-e>', creating_user_text)
+    root.bind('<Control-d>', del_text)
+    # root.bind('<Control-a>', lambda: gtc(clipboard_text))
+    # root.bind('<Control-s>', lambda: gtc(clipboard_SMS))
 
 
-"""
-Созданте горячих клавиш
-"""
-
-root.bind('<Control-e>', get_text)
-root.bind('<Control-d>', del_text)
-# root.bind('<Control-a>', lambda: gtc(clipboard_text))
-# root.bind('<Control-s>', lambda: gtc(clipboard_SMS))
-"""
-Создание экземпляра Frame и LabelFrame 
-"""
-frame_alex = LabelFrame(root, text="To Alex")
-frame_sms = LabelFrame(root, text="SMS")
-frame_left_entries = Frame(root)
-frame_right_setup = Frame(root)
+creating_hotkeys()
 
 
 def open_new_window():
     """
-
+    New window creation
     :return:
     """
     # Create the new window
@@ -256,7 +266,7 @@ def open_new_window():
 
     def process_inputs():
         """
-
+        Button Add engine
         :return:
         """
         entry_string = entry_to_database.get()
@@ -289,15 +299,15 @@ def open_new_window():
 Создание экземпляра Butoon 
 """
 button_setup = Button(frame_right_setup, text="Setup", command=open_new_window)
-button_copy_to_alex = Button(frame_alex, text='Copy to Alex', command=lambda: gtc(clipboard_keepass_text))
-button_copy_to_sms = Button(frame_sms, text='Copy to SMS', command=lambda: gtc(clipboard_SMS_txt))
+button_copy_to_alex = Button(frame_alex, text='Copy to Alex', command=lambda: copy_to_clipboard(clipboard_keepass_text))
+button_copy_to_sms = Button(frame_sms, text='Copy to SMS', command=lambda: copy_to_clipboard(clipboard_SMS_txt))
 
 button_send_to_alex = Button(frame_alex, text='Send to Alex',
                              command=lambda: send_mail(mail_to_alex, clipboard_keepass_text))
 button_send_to_sms = Button(frame_sms, text='Send to SMS',
                             command=lambda: send_mail(mail_to_sms, clipboard_SMS_txt))
 
-button_enter = Button(frame_left_entries, text="Enter", command=get_text, underline=0)
+button_enter = Button(frame_left_entries, text="Enter", command=creating_user_text, underline=0)
 
 button_delete = Button(frame_left_entries, text="Delete all", command=del_text, underline=0)
 style = Style()
@@ -346,61 +356,71 @@ entry_alex.insert(END, 'deniss.hohlov@gmail.com')
 entry_SMS = Entry(frame_sms, width=30)
 entry_SMS.insert(END, 'deniss.hohlov@gmail.com')
 
+
 # lb_name_print.grid(row=9, column=3)
 
-"""
-Left frame
-"""
-frame_left_entries.grid(row=0, column=0, columnspan=3, sticky="w", pady=10, padx=10)
-
-labels = [label_name, label_surname, label_ester, label_ik, label_tht_kood, label_phone, label_info]
-entries = [entry_name, entry_surname, entry_ester, entry_personal_id, entry_tht_code, entry_phone, entry_info]
-
-# Labels printing
-for i, label in enumerate(labels):
-    label.grid(row=i, column=0, pady=2)
-
-# Entries printing
-for i, entry in enumerate(entries):
-    entry.grid(row=i, column=1, sticky="w", ipadx=entry_len)
-
-button_enter.grid(row=7, column=1, ipadx=15, ipady=5, pady=10)
-button_delete.grid(row=0, column=2, padx=10)
-
-"""
-Right frame
-"""
-frame_right_setup.grid(row=0, column=2)
-button_setup.grid(row=0, column=0)
-
-"""
-To Alex
-"""
-frame_alex.grid(row=4, column=0, columnspan=3, padx=10)
-text_text.grid(row=0, column=0, rowspan=11, sticky="we")
-button_send_to_alex.grid(row=0, column=1, ipadx=10, ipady=5, sticky="we")
-button_copy_to_alex.grid(row=1, column=1, ipadx=10, ipady=5, sticky="we")
-entry_alex.grid(row=2, column=1, sticky="we", padx=10)
-
-"""
-SMS frame content
-"""
-frame_sms.grid(row=9, column=0, columnspan=3, pady=10)
-text_SMS.grid(row=0, column=0, rowspan=6, sticky="we")
-button_send_to_sms.grid(row=0, column=1, ipadx=10, ipady=5, sticky="we")
-button_copy_to_sms.grid(row=1, column=1, ipadx=10, ipady=5, sticky="we")
-entry_SMS.grid(row=2, column=1, padx=10, sticky="we")
-
-
-def gtc(dtxt, *event):
+def left_frame():
     """
+    Left frame
+    """
+    frame_left_entries.grid(row=0, column=0, columnspan=3, sticky="w", pady=10, padx=10)
+    labels = [label_name, label_surname, label_ester, label_ik, label_tht_kood, label_phone, label_info]
+    entries = [entry_name, entry_surname, entry_ester, entry_personal_id, entry_tht_code, entry_phone, entry_info]
+    # Labels printing
+    for i, label in enumerate(labels):
+        label.grid(row=i, column=0, pady=2)
+    # Entries printing
+    for i, entry in enumerate(entries):
+        entry.grid(row=i, column=1, sticky="w", ipadx=entry_len)
+    button_enter.grid(row=7, column=1, ipadx=15, ipady=5, pady=10)
+    button_delete.grid(row=0, column=2, padx=10)
 
-    :param dtxt:
-    :param event:
+
+def fight_frame():
+    """
+    Right frame
+    """
+    frame_right_setup.grid(row=0, column=2)
+    button_setup.grid(row=0, column=0)
+
+
+def keepass_frame():
+    """
+    To Alex
+    """
+    frame_alex.grid(row=4, column=0, columnspan=3, padx=10)
+    text_text.grid(row=0, column=0, rowspan=11, sticky="we")
+    button_send_to_alex.grid(row=0, column=1, ipadx=10, ipady=5, sticky="we")
+    button_copy_to_alex.grid(row=1, column=1, ipadx=10, ipady=5, sticky="we")
+    entry_alex.grid(row=2, column=1, sticky="we", padx=10)
+
+
+def sms_frame():
+    """
+    SMS frame content
+    """
+    frame_sms.grid(row=9, column=0, columnspan=3, pady=10)
+    text_SMS.grid(row=0, column=0, rowspan=6, sticky="we")
+    button_send_to_sms.grid(row=0, column=1, ipadx=10, ipady=5, sticky="we")
+    button_copy_to_sms.grid(row=1, column=1, ipadx=10, ipady=5, sticky="we")
+    entry_SMS.grid(row=2, column=1, padx=10, sticky="we")
+
+
+left_frame()
+fight_frame()
+keepass_frame()
+sms_frame()
+
+
+def copy_to_clipboard(clipboard_text, *event):
+    """
+    Clipboard engine
+    :param clipboard_text:
+    :param event: short key
     :return:
     """
     root.clipboard_clear()
-    root.clipboard_append(dtxt)
+    root.clipboard_append(clipboard_text)
 
 
 root.mainloop()
