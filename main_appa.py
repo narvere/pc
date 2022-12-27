@@ -30,56 +30,109 @@ text_width = 50
 text_height = 11
 enttry_len = 40
 
+clipboard_keepass_text = ""
+clipboard_SMS_txt = ""
+
 
 # Validation functions
 def is_alpha(string):
+    """
+    The function checks if the string is literal characters.
+    :param string: The string to validate entered by the user
+    :return: True or False
+    """
     return string.isalpha()
 
 
 def is_numeric(string):
+    """
+    The function checks if the string is numeric characters.
+    :param string: The string to validate entered by the user
+    :return: True or False
+    """
     return string.isnumeric() and len(string) == 11
 
 
 def is_alnum(string):
+    """
+    The function checks if all the characters are alphanumeric, meaning alphabet letter (a-z) and numbers (0-9).
+    :param string: The string to validate entered by the user
+    :return: True or False
+    """
     return string.isalnum()
 
 
 def is_empty(string):
+    """
+    The function checks if the string is empty
+    :param string: The string to validate entered by the user
+    :return: True or False
+    """
     return bool(string)
 
 
 # Other functions
 def string_check(string):
+    """
+    Checking variables label_first_name and label_last_name
+    :param string: The string to validate entered by the user
+    :return: return 0 if validation failed
+    """
     if not is_alpha(string.strip()):
         messagebox.showerror("Error", f"{label_first_name}или {label_last_name}- cодержат ошибку!")
         return 0
 
 
 def numeric_check(string):
+    """
+    Checking variables label_personal_id
+    :param string: The string to validate entered by the user
+    :return: return 0 if validation failed
+    """
     if not is_numeric(string):
         messagebox.showerror("Error", f"{label_personal_id}- cодержит ошибку!")
         return 0
 
 
 def login_tht_check(string):
+    """
+    Checking variables label_ester_login and label_tht_code
+    :param string: The string to validate entered by the user
+    :return: return 0 if validation failed
+    """
     if not is_alnum(string):
         messagebox.showerror("Error", f"{label_ester_login}или {label_tht_code}- cодержат ошибку!")
         return 0
 
 
 def checking_emty_string(string):
+    """
+    Checking variables label_additional_info and label_phone_number
+    :param string: The string to validate entered by the user
+    :return: return 0 if validation failed
+    """
     if not is_empty(string):
         messagebox.showerror("Error", f"{label_additional_info}или {label_phone_number}- пустые!")
         return 0
 
 
-def checking_emty_string2(string):
-    if not is_empty(string):
-        messagebox.showerror("Error", f"Адрес не введен!")
-        return 0
+# def checking_emty_string2(string):
+#     """
+#
+#     :param string: The string to validate entered by the user
+#     :return:
+#     """
+#     if not is_empty(string):
+#         messagebox.showerror("Error", f"Адрес не введен!")
+#         return 0
 
 
 def del_text(*event):
+    """
+    Removing user text from manin window
+    :param event:
+    :return:
+    """
     text_text.delete(1.0, END)
     text_SMS.delete(1.0, END)
     entry_name.delete(0, END)
@@ -92,27 +145,50 @@ def del_text(*event):
 
 
 def get_text(*event):
-    if not string_check(entry_name.get()) and not string_check(entry_surname.get()):
-        if not numeric_check(entry_personal_id.get()):
-            if not login_tht_check(entry_ester.get()):
-                if not checking_emty_string(entry_info.get()) and not checking_emty_string(entry_phone.get()):
-                    global clipboard_text, clipboard_SMS_txt
-                    additional_info, ester_login, ester_pass, first_name, first_name_speller, last_name_speller, \
-                        last_surname, pc_login, pc_pass, personal_id, phone_number, tht_code, zimbra_mail, \
-                        zimbra_pass = generate_message_variables()
-                    clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}{ester_login}\n" \
-                                        f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail}\n{label_zimbra_pass}{zimbra_pass} "
-                    clipboard_text = f"{label_first_name}{first_name} {last_surname} / {first_name_speller} {last_name_speller} " \
-                                     f"\n{clipboard_SMS_txt}\n{label_personal_id}{personal_id}\n{label_tht_code}{tht_code}\n" \
-                                     f"{label_phone_number}{phone_number}\n{label_additional_info}{additional_info}"
+    """
 
-                    print_alex_method(ester_pass, first_name, first_name_speller, last_name_speller, last_surname,
-                                      pc_login, pc_pass, zimbra_mail, zimbra_pass)
+    :param event:
+    :return:
+    """
+    if not string_check(entry_name.get()) and not string_check(entry_surname.get()) and not numeric_check(
+            entry_personal_id.get()) and not login_tht_check(entry_ester.get()) and not checking_emty_string(
+        entry_info.get()) and not checking_emty_string(entry_phone.get()):
+        ester_pass, first_name, first_name_speller, last_name_speller, \
+            last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass = clipboard_adding()
 
-                    print_sms_method(ester_pass, first_name_speller, last_name_speller, pc_login, pc_pass, zimbra_pass)
+        # Data output to save to KeePass
+        print_keepass_method(ester_pass, first_name, first_name_speller, last_name_speller, last_surname,
+                             pc_login, pc_pass, zimbra_mail, zimbra_pass)
+        # Data output to save to SMS
+        print_sms_method(ester_pass, first_name_speller, last_name_speller, pc_login, pc_pass, zimbra_pass)
+
+
+def clipboard_adding():
+    global clipboard_keepass_text, clipboard_SMS_txt
+    additional_info, ester_login, ester_pass, first_name, first_name_speller, last_name_speller, \
+        last_surname, pc_login, pc_pass, personal_id, phone_number, tht_code, zimbra_mail, \
+        zimbra_pass = generate_message_variables()
+    # Save to clipboard SMS text
+    clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}{ester_login}\n" \
+                        f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail}\n{label_zimbra_pass}{zimbra_pass} "
+    # Save to clipboard KeePass text
+    clipboard_keepass_text = f"{label_first_name}{first_name} {last_surname} / {first_name_speller} {last_name_speller} " \
+                             f"\n{clipboard_SMS_txt}\n{label_personal_id}{personal_id}\n{label_tht_code}{tht_code}\n" \
+                             f"{label_phone_number}{phone_number}\n{label_additional_info}{additional_info}"
+    return ester_pass, first_name, first_name_speller, last_name_speller, last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass
 
 
 def print_sms_method(ester_pass, first_name_spelling, last_name_spelling, pc_login, pc_pass, zimbra_pass):
+    """
+
+    :param ester_pass:
+    :param first_name_spelling:
+    :param last_name_spelling:
+    :param pc_login:
+    :param pc_pass:
+    :param zimbra_pass:
+    :return:
+    """
     # Clear txt_textSMS widget
     text_SMS.delete(1.0, END)
 
@@ -132,8 +208,22 @@ def print_sms_method(ester_pass, first_name_spelling, last_name_spelling, pc_log
     text_SMS.insert(index=6.0, chars=zimbra_pass_text)
 
 
-def print_alex_method(ester_pass, first_name, first_name_spelling, last_name_spelling, last_surname, pc_login, pc_pass,
-                      zimbra_mail, zimbra_pass):
+def print_keepass_method(ester_pass, first_name, first_name_spelling, last_name_spelling, last_surname, pc_login,
+                         pc_pass,
+                         zimbra_mail, zimbra_pass):
+    """
+
+    :param ester_pass:
+    :param first_name:
+    :param first_name_spelling:
+    :param last_name_spelling:
+    :param last_surname:
+    :param pc_login:
+    :param pc_pass:
+    :param zimbra_mail:
+    :param zimbra_pass:
+    :return:
+    """
     # Clear txt_text widget
     text_text.delete(1.0, END)
 
@@ -164,6 +254,10 @@ def print_alex_method(ester_pass, first_name, first_name_spelling, last_name_spe
 
 
 def generate_message_variables():
+    """
+
+    :return:
+    """
     # Generate passwords
     pc_pass, ester_pass, zimbra_pass = pass_gen()
 
@@ -202,6 +296,11 @@ def generate_message_variables():
 
 
 def show_error(ex):
+    """
+
+    :param ex:
+    :return:
+    """
     messagebox.showerror("Error", ex)
 
 
@@ -223,6 +322,10 @@ frame_right_setup = Frame(root)
 
 
 def open_new_window():
+    """
+
+    :return:
+    """
     # Create the new window
     new_window = Toplevel(root)
     new_window.geometry("500x250")
@@ -246,6 +349,10 @@ def open_new_window():
         # print(entry_to_database.get())
 
     def process_inputs():
+        """
+
+        :return:
+        """
         entry_string = entry_to_database.get()
         if not is_empty(entry_string):
             raise ValueError("String is empty")
@@ -276,13 +383,13 @@ def open_new_window():
 Создание экземпляра Butoon 
 """
 button_setup = Button(frame_right_setup, text="Setup", command=open_new_window)
-button_copy_to_alex = Button(frame_alex, text='Copy to Alex', command=lambda: gtc(clipboard_text))
+button_copy_to_alex = Button(frame_alex, text='Copy to Alex', command=lambda: gtc(clipboard_keepass_text))
 button_copy_to_sms = Button(frame_sms, text='Copy to SMS', command=lambda: gtc(clipboard_SMS_txt))
 
 button_send_to_alex = Button(frame_alex, text='Send to Alex',
-                             command=lambda: send_mail(mail_to_alex, clipboard_text))
+                             command=lambda: send_mail(mail_to_alex, clipboard_keepass_text))
 button_send_to_sms = Button(frame_sms, text='Send to SMS',
-                            command=lambda: send_mail(mail_to_sms, clipboard_text))
+                            command=lambda: send_mail(mail_to_sms, clipboard_keepass_text))
 # except Exception as ex:
 #     show_error(ex)
 
@@ -382,6 +489,12 @@ entry_SMS.grid(row=2, column=1, padx=10, sticky="we")
 
 
 def gtc(dtxt, *event):
+    """
+
+    :param dtxt:
+    :param event:
+    :return:
+    """
     root.clipboard_clear()
     root.clipboard_append(dtxt)
 
