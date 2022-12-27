@@ -10,8 +10,7 @@ root.resizable(width=False, height=False)
 root.title("Narva Haigla tool by Deniss Hohlov")
 
 # Mailing and SMS configurations
-# mail_to_alex = "alexey.bystrov@narvahaigla.ee"
-mail_to_alex = "deniss.hohlov@narvahaigla.ee"
+mail_to_alex = "alexey.bystrov@narvahaigla.ee"
 mail_to_sms = "deniss.hohlov@narvahaigla.ee"
 
 # Constants for input fields
@@ -29,10 +28,10 @@ label_zimbra_mail = "Zimbra: "
 label_zimbra_pass = "Zimbra pass: "
 text_width = 50
 text_height = 11
-entry_len = 40
+enttry_len = 40
 
-# clipboard_keepass_text = ""
-# clipboard_SMS_txt = ""
+clipboard_keepass_text = ""
+clipboard_SMS_txt = ""
 
 
 # Validation functions
@@ -130,7 +129,7 @@ def checking_emty_string(string):
 
 def del_text(*event):
     """
-    Removing user text from main window
+    Removing user text from manin window
     :param event:
     :return:
     """
@@ -145,24 +144,15 @@ def del_text(*event):
     entry_info.delete(0, END)
 
 
-def validating_user_data():
+def get_text(*event):
     """
-    Validating all user entered data
-    :return: True of False
-    """
-    return not string_check(entry_name.get()) and not string_check(entry_surname.get()) and not numeric_check(
-            entry_personal_id.get()) and not login_tht_check(entry_ester.get()) and not checking_emty_string(
-        entry_info.get()) and not checking_emty_string(entry_phone.get())
 
-
-def creating_user_data_text(*event):
-    """
-    Creating text to send SMS and to KeePass
-    :param event: *event needs for shortcuts
+    :param event:
     :return:
     """
-    if not validating_user_data():
-        # Sending data to clipboard function
+    if not string_check(entry_name.get()) and not string_check(entry_surname.get()) and not numeric_check(
+            entry_personal_id.get()) and not login_tht_check(entry_ester.get()) and not checking_emty_string(
+        entry_info.get()) and not checking_emty_string(entry_phone.get()):
         ester_pass, first_name, first_name_speller, last_name_speller, \
             last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass = clipboard_adding()
 
@@ -318,7 +308,7 @@ def show_error(ex):
 Созданте горячих клавиш
 """
 
-root.bind('<Control-e>', creating_user_data_text)
+root.bind('<Control-e>', get_text)
 root.bind('<Control-d>', del_text)
 # root.bind('<Control-a>', lambda: gtc(clipboard_text))
 # root.bind('<Control-s>', lambda: gtc(clipboard_SMS))
@@ -382,7 +372,7 @@ def open_new_window():
 
     # Create a label widget and add it to the new window
 
-    entry_to_database.grid(row=0, column=0, ipadx=entry_len)
+    entry_to_database.grid(row=0, column=0, ipadx=enttry_len)
     # Pack the checkbox widgets
     checkbox1.grid(row=0, column=1)
     checkbox2.grid(row=0, column=2)
@@ -403,7 +393,7 @@ button_send_to_sms = Button(frame_sms, text='Send to SMS',
 # except Exception as ex:
 #     show_error(ex)
 
-button_enter = Button(frame_left_entries, text="Enter", command=creating_user_data_text, underline=0)
+button_enter = Button(frame_left_entries, text="Enter", command=get_text, underline=0)
 
 button_delete = Button(frame_left_entries, text="Delete all", command=del_text, underline=0)
 style = Style()
@@ -468,7 +458,7 @@ for i, label in enumerate(labels):
 
 # Entries printing
 for i, entry in enumerate(entries):
-    entry.grid(row=i, column=1, sticky="w", ipadx=entry_len)
+    entry.grid(row=i, column=1, sticky="w", ipadx=enttry_len)
 
 button_enter.grid(row=7, column=1, ipadx=15, ipady=5, pady=10)
 button_delete.grid(row=0, column=2, padx=10)
