@@ -1,7 +1,7 @@
 from tkinter import Tk, END, Text, Label, Frame, LabelFrame, Toplevel, IntVar, Checkbutton
 from tkinter.ttk import Entry, Button, Style
 from pass_gen import pass_gen, eesti_speller
-from good import send_mail
+from mail_engine import send_mail
 import tkinter.messagebox as messagebox
 
 root = Tk()
@@ -29,7 +29,7 @@ label_zimbra_mail = "Zimbra: "
 label_zimbra_pass = "Zimbra pass: "
 text_width = 50
 text_height = 11
-enttry_len = 40
+entry_len = 40
 
 clipboard_keepass_text = ""
 clipboard_SMS_txt = ""
@@ -39,7 +39,7 @@ clipboard_SMS_txt = ""
 def is_alpha(string):
     """
     The function checks if the string is literal characters.
-    :param string: The string to validate entered by the user
+    :param string: The string to validate entered by the user.
     :return: True or False
     """
     return string.isalpha()
@@ -48,7 +48,7 @@ def is_alpha(string):
 def is_numeric(string):
     """
     The function checks if the string is numeric characters.
-    :param string: The string to validate entered by the user
+    :param string: The string to validate entered by the user.
     :return: True or False
     """
     return string.isnumeric() and len(string) == 11
@@ -174,12 +174,15 @@ def clipboard_adding():
         zimbra_pass, zimbra_mail_sms = generate_message_variables()
     # Save to clipboard SMS text
     clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}{ester_login}\n" \
-                        f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail_sms}\n{label_zimbra_pass}{zimbra_pass} "
+                        f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail_sms}\n" \
+                        f"{label_zimbra_pass}{zimbra_pass} "
     # Save to clipboard KeePass text
-    clipboard_keepass_text = f"{label_first_name}{first_name} {last_surname} / {first_name_speller} {last_name_speller} " \
+    clipboard_keepass_text = f"{label_first_name}{first_name} {last_surname} / {first_name_speller} " \
+                             f"{last_name_speller} " \
                              f"\n{clipboard_SMS_txt}\n{label_personal_id}{personal_id}\n{label_tht_code}{tht_code}\n" \
                              f"{label_phone_number}{phone_number}\n{label_additional_info}{additional_info}"
-    return ester_pass, first_name, first_name_speller, last_name_speller, last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass
+    return ester_pass, first_name, first_name_speller, last_name_speller, \
+        last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass
 
 
 def print_sms_method(ester_pass, first_name_spelling, last_name_spelling, pc_login, pc_pass, zimbra_pass):
@@ -296,8 +299,9 @@ def generate_message_variables():
     # Extract additional info
     additional_info = entry_info.get()
     # name_print["text"] = nimi + first_name + " " + last_surname + '\n'
-    return additional_info, ester_login, ester_pass, first_name, first_name_spelling, last_name_spelling, last_surname, \
-        pc_login, pc_pass, personal_id, phone_number, tht_code, zimbra_mail, zimbra_pass, zimbra_mail_sms
+    return additional_info, ester_login, ester_pass, first_name, first_name_spelling, \
+        last_name_spelling, last_surname, pc_login, pc_pass, personal_id, phone_number, \
+        tht_code, zimbra_mail, zimbra_pass, zimbra_mail_sms
 
 
 def show_error(ex):
@@ -346,12 +350,12 @@ def open_new_window():
     checkbox2 = Checkbutton(new_window, text="SMS", variable=checkbox2_var, onvalue=1, offvalue=0)
 
     # Define callback functions to print the state of the checkboxes
-    def print_checkbox_state(checkbox_var, checkbox_num):
-        return checkbox_var, checkbox_num
-        # print(f"Keepass {checkbox_num} SMS: {checkbox_var.get()}")
+    # def print_checkbox_state(checkbox_var, checkbox_num):
+    #     return checkbox_var, checkbox_num
+    # print(f"Keepass {checkbox_num} SMS: {checkbox_var.get()}")
 
-        # printing()
-        # print(entry_to_database.get())
+    # printing()
+    # print(entry_to_database.get())
 
     def process_inputs():
         """
@@ -377,7 +381,7 @@ def open_new_window():
 
     # Create a label widget and add it to the new window
 
-    entry_to_database.grid(row=0, column=0, ipadx=enttry_len)
+    entry_to_database.grid(row=0, column=0, ipadx=entry_len)
     # Pack the checkbox widgets
     checkbox1.grid(row=0, column=1)
     checkbox2.grid(row=0, column=2)
@@ -463,7 +467,7 @@ for i, label in enumerate(labels):
 
 # Entries printing
 for i, entry in enumerate(entries):
-    entry.grid(row=i, column=1, sticky="w", ipadx=enttry_len)
+    entry.grid(row=i, column=1, sticky="w", ipadx=entry_len)
 
 button_enter.grid(row=7, column=1, ipadx=15, ipady=5, pady=10)
 button_delete.grid(row=0, column=2, padx=10)
