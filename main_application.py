@@ -1,120 +1,26 @@
 from tkinter import Tk, END, Text, Label, Frame, LabelFrame, Toplevel, IntVar, Checkbutton
 from tkinter.ttk import Entry, Button, Style
-from pass_gen import pass_gen, eesti_speller
+
+import variables
+from pass_generator import pass_gen, eesti_speller
 from mail_engine import send_mail
 import tkinter.messagebox as messagebox
+
+from validators import is_empty, string_check, numeric_check, login_tht_check, checking_emty_string
+from variables import mail_to_alex, mail_to_sms, label_first_name, label_last_name, \
+    label_ester_login, label_personal_id, \
+    label_phone_number, label_additional_info, label_tht_code, label_pc_login, label_pc_pass, label_ester_pass, \
+    label_zimbra_mail, label_zimbra_pass, text_width, text_height, entry_len, clipboard_keepass_text, clipboard_SMS_txt
 
 root = Tk()
 root.geometry("630x600+700+300")
 root.resizable(width=False, height=False)
 root.title("Narva Haigla tool by Deniss Hohlov")
 
+
 # Mailing and SMS configurations
 # mail_to_alex = "alexey.bystrov@narvahaigla.ee"
-mail_to_alex = "deniss.hohlov@narvahaigla.ee"
-mail_to_sms = "deniss.hohlov@narvahaigla.ee"
-
-# Constants for input fields
-label_first_name = "Nimi: "
-label_last_name = "Perekonnanimi: "
-label_ester_login = "Ester login: "
-label_personal_id = "Isikukood: "
-label_phone_number = "Telefon: "
-label_additional_info = "Info: "
-label_tht_code = "THT code: "
-label_pc_login = "Arvuti login: "
-label_pc_pass = "Arvuti pass: "
-label_ester_pass = "Ester pass: "
-label_zimbra_mail = "Zimbra: "
-label_zimbra_pass = "Zimbra pass: "
-text_width = 50
-text_height = 11
-entry_len = 40
-
-clipboard_keepass_text = ""
-clipboard_SMS_txt = ""
-
-
-# Validation functions
-def is_alpha(string):
-    """
-    The function checks if the string is literal characters.
-    :param string: The string to validate entered by the user.
-    :return: True or False
-    """
-    return string.isalpha()
-
-
-def is_numeric(string):
-    """
-    The function checks if the string is numeric characters.
-    :param string: The string to validate entered by the user.
-    :return: True or False
-    """
-    return string.isnumeric() and len(string) == 11
-
-
-def is_alnum(string):
-    """
-    The function checks if all the characters are alphanumeric, meaning alphabet letter (a-z) and numbers (0-9).
-    :param string: The string to validate entered by the user
-    :return: True or False
-    """
-    return string.isalnum()
-
-
-def is_empty(string):
-    """
-    The function checks if the string is empty
-    :param string: The string to validate entered by the user
-    :return: True or False
-    """
-    return bool(string)
-
-
-# Other functions
-def string_check(string):
-    """
-    Checking variables label_first_name and label_last_name
-    :param string: The string to validate entered by the user
-    :return: return 0 if validation failed
-    """
-    if not is_alpha(string.strip()):
-        messagebox.showerror("Error", f"{label_first_name}или {label_last_name}- cодержат ошибку!")
-        return 0
-
-
-def numeric_check(string):
-    """
-    Checking variables label_personal_id
-    :param string: The string to validate entered by the user
-    :return: return 0 if validation failed
-    """
-    if not is_numeric(string):
-        messagebox.showerror("Error", f"{label_personal_id}- cодержит ошибку!")
-        return 0
-
-
-def login_tht_check(string):
-    """
-    Checking variables label_ester_login and label_tht_code
-    :param string: The string to validate entered by the user
-    :return: return 0 if validation failed
-    """
-    if not is_alnum(string):
-        messagebox.showerror("Error", f"{label_ester_login}или {label_tht_code}- cодержат ошибку!")
-        return 0
-
-
-def checking_emty_string(string):
-    """
-    Checking variables label_additional_info and label_phone_number
-    :param string: The string to validate entered by the user
-    :return: return 0 if validation failed
-    """
-    if not is_empty(string):
-        messagebox.showerror("Error", f"{label_additional_info}или {label_phone_number}- пустые!")
-        return 0
+# mail_to_sms = "sergei.zaitsev@narvahaigla.ee"
 
 
 # def checking_emty_string2(string):
@@ -168,19 +74,18 @@ def get_text(*event):
 
 
 def clipboard_adding():
-    global clipboard_keepass_text, clipboard_SMS_txt
     additional_info, ester_login, ester_pass, first_name, first_name_speller, last_name_speller, \
         last_surname, pc_login, pc_pass, personal_id, phone_number, tht_code, zimbra_mail, \
         zimbra_pass, zimbra_mail_sms = generate_message_variables()
     # Save to clipboard SMS text
-    clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}{ester_login}\n" \
-                        f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail_sms}\n" \
-                        f"{label_zimbra_pass}{zimbra_pass} "
+    variables.clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}{ester_login}\n" \
+                                  f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail_sms}\n" \
+                                  f"{label_zimbra_pass}{zimbra_pass} "
     # Save to clipboard KeePass text
-    clipboard_keepass_text = f"{label_first_name}{first_name} {last_surname} / {first_name_speller} " \
-                             f"{last_name_speller} " \
-                             f"\n{clipboard_SMS_txt}\n{label_personal_id}{personal_id}\n{label_tht_code}{tht_code}\n" \
-                             f"{label_phone_number}{phone_number}\n{label_additional_info}{additional_info}"
+    variables.clipboard_keepass_text = f"{label_first_name}{first_name} {last_surname} / {first_name_speller} " \
+                                       f"{last_name_speller} " \
+                                       f"\n{variables.clipboard_SMS_txt}\n{label_personal_id}{personal_id}\n{label_tht_code}{tht_code}\n" \
+                                       f"{label_phone_number}{phone_number}\n{label_additional_info}{additional_info}"
     return ester_pass, first_name, first_name_speller, last_name_speller, \
         last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass
 
@@ -344,18 +249,10 @@ def open_new_window():
     checkbox2_var = IntVar()
 
     entry_to_database = Entry(new_window)
-    # mm = entry_to_database.get()
+
     # Create checkbox widgets
     checkbox1 = Checkbutton(new_window, text="Keepass", variable=checkbox1_var, onvalue=1, offvalue=0)
     checkbox2 = Checkbutton(new_window, text="SMS", variable=checkbox2_var, onvalue=1, offvalue=0)
-
-    # Define callback functions to print the state of the checkboxes
-    # def print_checkbox_state(checkbox_var, checkbox_num):
-    #     return checkbox_var, checkbox_num
-    # print(f"Keepass {checkbox_num} SMS: {checkbox_var.get()}")
-
-    # printing()
-    # print(entry_to_database.get())
 
     def process_inputs():
         """
@@ -399,8 +296,6 @@ button_send_to_alex = Button(frame_alex, text='Send to Alex',
                              command=lambda: send_mail(mail_to_alex, clipboard_keepass_text))
 button_send_to_sms = Button(frame_sms, text='Send to SMS',
                             command=lambda: send_mail(mail_to_sms, clipboard_SMS_txt))
-# except Exception as ex:
-#     show_error(ex)
 
 button_enter = Button(frame_left_entries, text="Enter", command=get_text, underline=0)
 
