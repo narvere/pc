@@ -10,7 +10,8 @@ root.resizable(width=False, height=False)
 root.title("Narva Haigla tool by Deniss Hohlov")
 
 # Mailing and SMS configurations
-mail_to_alex = "alexey.bystrov@narvahaigla.ee"
+# mail_to_alex = "alexey.bystrov@narvahaigla.ee"
+mail_to_alex = "deniss.hohlov@narvahaigla.ee"
 mail_to_sms = "deniss.hohlov@narvahaigla.ee"
 
 # Constants for input fields
@@ -150,9 +151,12 @@ def get_text(*event):
     :param event:
     :return:
     """
-    if not string_check(entry_name.get()) and not string_check(entry_surname.get()) and not numeric_check(
-            entry_personal_id.get()) and not login_tht_check(entry_ester.get()) and not checking_emty_string(
-        entry_info.get()) and not checking_emty_string(entry_phone.get()):
+    if not string_check(entry_name.get()) \
+            and not string_check(entry_surname.get()) \
+            and not numeric_check(entry_personal_id.get()) \
+            and not login_tht_check(entry_ester.get()) \
+            and not checking_emty_string(entry_info.get()) \
+            and not checking_emty_string(entry_phone.get()):
         ester_pass, first_name, first_name_speller, last_name_speller, \
             last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass = clipboard_adding()
 
@@ -167,10 +171,10 @@ def clipboard_adding():
     global clipboard_keepass_text, clipboard_SMS_txt
     additional_info, ester_login, ester_pass, first_name, first_name_speller, last_name_speller, \
         last_surname, pc_login, pc_pass, personal_id, phone_number, tht_code, zimbra_mail, \
-        zimbra_pass = generate_message_variables()
+        zimbra_pass, zimbra_mail_sms = generate_message_variables()
     # Save to clipboard SMS text
     clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}{ester_login}\n" \
-                        f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail}\n{label_zimbra_pass}{zimbra_pass} "
+                        f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail_sms}\n{label_zimbra_pass}{zimbra_pass} "
     # Save to clipboard KeePass text
     clipboard_keepass_text = f"{label_first_name}{first_name} {last_surname} / {first_name_speller} {last_name_speller} " \
                              f"\n{clipboard_SMS_txt}\n{label_personal_id}{personal_id}\n{label_tht_code}{tht_code}\n" \
@@ -272,6 +276,7 @@ def generate_message_variables():
 
     # Generate Zimbra email address
     zimbra_mail = f"{first_name_spelling.lower()}.{last_name_spelling.lower()}@narvahaigla.ee"
+    zimbra_mail_sms = f"{first_name_spelling.lower()}.{last_name_spelling.lower()}"
 
     # Generate PC login
     pc_login = entry_ester.get()[1:].strip().lower().title()
@@ -292,7 +297,7 @@ def generate_message_variables():
     additional_info = entry_info.get()
     # name_print["text"] = nimi + first_name + " " + last_surname + '\n'
     return additional_info, ester_login, ester_pass, first_name, first_name_spelling, last_name_spelling, last_surname, \
-        pc_login, pc_pass, personal_id, phone_number, tht_code, zimbra_mail, zimbra_pass
+        pc_login, pc_pass, personal_id, phone_number, tht_code, zimbra_mail, zimbra_pass, zimbra_mail_sms
 
 
 def show_error(ex):
@@ -389,7 +394,7 @@ button_copy_to_sms = Button(frame_sms, text='Copy to SMS', command=lambda: gtc(c
 button_send_to_alex = Button(frame_alex, text='Send to Alex',
                              command=lambda: send_mail(mail_to_alex, clipboard_keepass_text))
 button_send_to_sms = Button(frame_sms, text='Send to SMS',
-                            command=lambda: send_mail(mail_to_sms, clipboard_keepass_text))
+                            command=lambda: send_mail(mail_to_sms, clipboard_SMS_txt))
 # except Exception as ex:
 #     show_error(ex)
 
