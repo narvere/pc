@@ -2,6 +2,7 @@
 text_width = 50
 text_height = 11
 entry_len = 40
+text_text_height = 7
 
 # Mailing and SMS configurations
 
@@ -23,8 +24,6 @@ label_pc_pass = "Arvuti pass: "
 label_ester_pass = "Ester pass: "
 label_zimbra_mail = "Zimbra mail: "
 label_zimbra_pass = "Zimbra pass: "
-# clipboard_keepass_text = ""
-# clipboard_SMS_txt = ""
 main_window_geometry = "630x600+600+200"
 setup_window_geometry = "500x250"
 title = "NH admin tool"

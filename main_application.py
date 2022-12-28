@@ -145,6 +145,7 @@ def print_sms_method(ester_pass, first_name_spelling, last_name_spelling, pc_log
     ester_pass_text = f"{label_ester_pass}{ester_pass}\n"
     zimbra_mail_text = f"{label_zimbra_mail}{first_name_spelling.lower()}.{last_name_spelling.lower()}\n"
     zimbra_pass_text = f"{label_zimbra_pass}{zimbra_pass}\n"
+    phone_pass_text = f"{label_phone_number}{entry_phone.get().strip()}\n"
 
     text_SMS.insert(index=1.0, chars=pc_login_text)
     text_SMS.insert(index=2.0, chars=pc_pass_text)
@@ -152,6 +153,8 @@ def print_sms_method(ester_pass, first_name_spelling, last_name_spelling, pc_log
     text_SMS.insert(index=4.0, chars=ester_pass_text)
     text_SMS.insert(index=5.0, chars=zimbra_mail_text)
     text_SMS.insert(index=6.0, chars=zimbra_pass_text)
+    text_SMS.insert(index=7.0, chars=phone_pass_text)
+
 
 
 def print_keepass_method(ester_pass, first_name, first_name_spelling, last_name_spelling, last_surname, pc_login,
@@ -388,7 +391,7 @@ label_tht_kood = Label(frame_left_entries, text=label_tht_code, width=12, anchor
 Создание экземпляра Text 
 """
 text_text = Text(frame_keepass, width=text_width, height=text_height)
-text_SMS = Text(frame_sms, width=text_width, height=6)
+text_SMS = Text(frame_sms, width=text_width, height=text_text_height)
 
 """
 Создание экземпляра Entry 
