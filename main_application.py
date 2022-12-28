@@ -156,7 +156,6 @@ def print_sms_method(ester_pass, first_name_spelling, last_name_spelling, pc_log
     text_SMS.insert(index=7.0, chars=phone_pass_text)
 
 
-
 def print_keepass_method(ester_pass, first_name, first_name_spelling, last_name_spelling, last_surname, pc_login,
                          pc_pass,
                          zimbra_mail, zimbra_pass):
@@ -274,6 +273,7 @@ def open_new_window(*event):
     New window creation
     :return:
     """
+    global frame_setup
     # Create the new window
     new_window = Toplevel(root)
     new_window.geometry(setup_window_geometry)
@@ -320,22 +320,39 @@ def open_new_window(*event):
         fetching_data(frame_setup)
 
     # Create Add button
-    button_add = Button(new_window, text=add_button, command=process_inputs)
+    button_add = Button(new_window, text=add_email_button, command=process_inputs)
 
     # Create a label widget and add it to the new window
 
-    entry_to_database.grid(row=0, column=0, ipadx=entry_len)
+    entry_to_database.grid(row=0, column=0, ipadx=entry_len, sticky="w")
     # Pack the checkbox widgets
-    checkbox1_keepass.grid(row=0, column=1)
-    checkbox2_sms.grid(row=0, column=2)
-    button_add.grid(row=0, column=3)
+    checkbox1_keepass.grid(row=0, column=1, sticky="w")
+    checkbox2_sms.grid(row=0, column=2, sticky="w")
+    button_add.grid(row=0, column=3, sticky="w")
+
+
+def del_str(nr):
+    print(nr)
+    # Delete a row with a specific id
+    cursor.execute("DELETE FROM users WHERE id=?", (nr,))
+
+    # Commit the changes
+    conn.commit()
+
+    fetching_data(frame_setup)
+
+    # Close the connection
+    # conn.close()
 
 
 def fetching_data(frame_setup):
+
     # Select all rows from the table
     cursor.execute("SELECT * FROM users")
+
     # Fetch the rows
     rows = cursor.fetchall()
+
     # Print the rows
     for row in rows:
         mail = row[1]
@@ -344,8 +361,10 @@ def fetching_data(frame_setup):
         print(row)
 
         # label_add_mail = Label(frame_setup, text=f"{entry_string}, {checkbox1_state_keepass}, {checkbox2_state_sms}")
-        label_add_mail = Label(frame_setup, text=f"{mail}, {keepass}, {sms}")
+        label_add_mail = Label(frame_setup, text=f"{mail}, KeePass - {keepass}, SMS - {sms}")
         label_add_mail.grid(row=row[0], column=0, sticky="w")
+        xxx = Button(frame_setup, text="Del", command=lambda id=row[0]: del_str(id))
+        xxx.grid(row=row[0], column=1)
 
 
 """
