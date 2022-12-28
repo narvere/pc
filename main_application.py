@@ -2,44 +2,26 @@ from tkinter import Tk, END, Text, Label, Frame, LabelFrame, Toplevel, IntVar, C
 from tkinter.ttk import Entry, Button, Style
 
 import variables
+from variables import *
 from pass_generator import pass_gen, eesti_speller
 from mail_engine import send_mail
-# import tkinter.messagebox as messagebox
+import tkinter.messagebox as messagebox
+from isikukood import ikood
 
-from validators import is_empty, string_check, numeric_check, login_tht_check, checking_emty_string
-from variables import mail_to_alex, mail_to_sms, label_first_name, label_last_name, \
-    label_ester_login, label_personal_id, \
-    label_phone_number, label_additional_info, label_tht_code, label_pc_login, label_pc_pass, label_ester_pass, \
-    label_zimbra_mail, label_zimbra_pass, text_width, text_height, entry_len, clipboard_keepass_text, clipboard_SMS_txt
+from validators import is_empty
 
 root = Tk()
-root.geometry("630x600+700+300")
+root.geometry(main_window_geometry)
 root.resizable(width=False, height=False)
-root.title("Narva Haigla tool by Deniss Hohlov")
+root.title(title)
 
 """
 Создание экземпляра Frame и LabelFrame 
 """
-frame_alex = LabelFrame(root, text="To Alex")
-frame_sms = LabelFrame(root, text="SMS")
+frame_alex = LabelFrame(root, text=keepass_frame)
+frame_sms = LabelFrame(root, text=sms_frame)
 frame_left_entries = Frame(root)
 frame_right_setup = Frame(root)
-
-
-# Mailing and SMS configurations
-# mail_to_alex = "alexey.bystrov@narvahaigla.ee"
-# mail_to_sms = "sergei.zaitsev@narvahaigla.ee"
-
-
-# def checking_emty_string2(string):
-#     """
-#
-#     :param string: The string to validate entered by the user
-#     :return:
-#     """
-#     if not is_empty(string):
-#         messagebox.showerror("Error", f"Адрес не введен!")
-#         return 0
 
 
 def del_text(*event):
@@ -59,26 +41,42 @@ def del_text(*event):
     entry_info.delete(0, END)
 
 
+def error(err):
+    return messagebox.showerror("Error!", f"Поле {err[:-2]} - cодержит ошибку!")
+
+
 def creating_user_text(*event):
     """
     Getting validated user text, sending to clipboard, keepass and SMS functions
     :param event: event method is using for hot keys
     :return:
     """
-    if not string_check(entry_name.get()) \
-            and not string_check(entry_surname.get()) \
-            and not numeric_check(entry_personal_id.get()) \
-            and not login_tht_check(entry_ester.get()) \
-            and not checking_emty_string(entry_info.get()) \
-            and not checking_emty_string(entry_phone.get()):
-        ester_pass, first_name, first_name_speller, last_name_speller, \
-            last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass = clipboard_adding()
+    if not entry_name.get().isalpha() and not entry_name.get().isalnum():
+        error(label_first_name)
+        return 0
+    if not entry_surname.get().isalpha() and not entry_surname.get().isalnum():
+        error(label_last_name)
+        return 0
+    if not entry_ester.get().isalnum():
+        error(label_ester_login)
+        return 0
+    if not ikood(entry_personal_id.get()):
+        error(label_personal_id)
+        return 0
+    if not bool(entry_phone.get()):
+        error(label_phone_number)
+        return 0
+    if not bool(entry_info.get()):
+        error(label_additional_info)
+        return 0
+    ester_pass, first_name, first_name_speller, last_name_speller, \
+        last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass = clipboard_adding()
 
-        # Data output to save to KeePass
-        print_keepass_method(ester_pass, first_name, first_name_speller, last_name_speller, last_surname,
-                             pc_login, pc_pass, zimbra_mail, zimbra_pass)
-        # Data output to save to SMS
-        print_sms_method(ester_pass, first_name_speller, last_name_speller, pc_login, pc_pass, zimbra_pass)
+    # Data output to save to KeePass
+    print_keepass_method(ester_pass, first_name, first_name_speller, last_name_speller, last_surname,
+                         pc_login, pc_pass, zimbra_mail, zimbra_pass)
+    # Data output to save to SMS
+    print_sms_method(ester_pass, first_name_speller, last_name_speller, pc_login, pc_pass, zimbra_pass)
 
 
 def clipboard_adding():
@@ -90,16 +88,16 @@ def clipboard_adding():
         last_surname, pc_login, pc_pass, personal_id, phone_number, tht_code, zimbra_mail, \
         zimbra_pass, zimbra_mail_sms = generate_message_variables()
     # Save to clipboard SMS text
-    variables.clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}" \
-                                  f"{ester_login}\n" \
-                                  f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail_sms}\n" \
-                                  f"{label_zimbra_pass}{zimbra_pass} "
+    clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}" \
+                        f"{ester_login}\n" \
+                        f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail_sms}\n" \
+                        f"{label_zimbra_pass}{zimbra_pass} "
     # Save to clipboard KeePass text
-    variables.clipboard_keepass_text = f"{label_first_name}{first_name} {last_surname} / {first_name_speller} " \
-                                       f"{last_name_speller} " \
-                                       f"\n{variables.clipboard_SMS_txt}\n{label_personal_id}{personal_id}\n" \
-                                       f"{label_tht_code}{tht_code}\n" \
-                                       f"{label_phone_number}{phone_number}\n{label_additional_info}{additional_info}"
+    clipboard_keepass_text = f"{label_first_name}{first_name} {last_surname} / {first_name_speller} " \
+                             f"{last_name_speller} " \
+                             f"\n{clipboard_SMS_txt}\n{label_personal_id}{personal_id}\n" \
+                             f"{label_tht_code}{tht_code}\n" \
+                             f"{label_phone_number}{phone_number}\n{label_additional_info}{additional_info}"
     return ester_pass, first_name, first_name_speller, last_name_speller, \
         last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass
 
@@ -197,7 +195,7 @@ def generate_message_variables():
     last_surname = entry_surname.get().strip().lower().title()
 
     # Generate Zimbra email address
-    zimbra_mail = f"{first_name_spelling.lower()}.{last_name_spelling.lower()}@narvahaigla.ee"
+    zimbra_mail = f"{first_name_spelling.lower()}.{last_name_spelling.lower()}{mail}"
     zimbra_mail_sms = f"{first_name_spelling.lower()}.{last_name_spelling.lower()}"
 
     # Generate PC login
@@ -252,7 +250,7 @@ def open_new_window():
     """
     # Create the new window
     new_window = Toplevel(root)
-    new_window.geometry("500x250")
+    new_window.geometry(setup_window)
 
     # Create Tkinter variables to track the state of the checkboxes
     checkbox1_var = IntVar()
@@ -261,8 +259,8 @@ def open_new_window():
     entry_to_database = Entry(new_window)
 
     # Create checkbox widgets
-    checkbox1 = Checkbutton(new_window, text="Keepass", variable=checkbox1_var, onvalue=1, offvalue=0)
-    checkbox2 = Checkbutton(new_window, text="SMS", variable=checkbox2_var, onvalue=1, offvalue=0)
+    checkbox1 = Checkbutton(new_window, text=variables.keepass_frame, variable=checkbox1_var, onvalue=1, offvalue=0)
+    checkbox2 = Checkbutton(new_window, text=variables.sms_frame, variable=checkbox2_var, onvalue=1, offvalue=0)
 
     def process_inputs():
         """
@@ -284,7 +282,7 @@ def open_new_window():
         print(entry_string, checkbox1_state, checkbox2_state)
 
     # Create Add button
-    button_add = Button(new_window, text="Add", command=process_inputs)
+    button_add = Button(new_window, text=add_button, command=process_inputs)
 
     # Create a label widget and add it to the new window
 
@@ -298,18 +296,19 @@ def open_new_window():
 """
 Создание экземпляра Butoon 
 """
-button_setup = Button(frame_right_setup, text="Setup", command=open_new_window)
-button_copy_to_alex = Button(frame_alex, text='Copy to Alex', command=lambda: copy_to_clipboard(clipboard_keepass_text))
-button_copy_to_sms = Button(frame_sms, text='Copy to SMS', command=lambda: copy_to_clipboard(clipboard_SMS_txt))
+button_setup = Button(frame_right_setup, text=setup_button, command=open_new_window)
+button_copy_to_alex = Button(frame_alex, text=copy_to_alex_button,
+                             command=lambda: copy_to_clipboard(clipboard_keepass_text))
+button_copy_to_sms = Button(frame_sms, text=copy_to_sms_button, command=lambda: copy_to_clipboard(clipboard_SMS_txt))
 
-button_send_to_alex = Button(frame_alex, text='Send to Alex',
+button_send_to_alex = Button(frame_alex, text=send_to_alex_button,
                              command=lambda: send_mail(mail_to_alex, clipboard_keepass_text))
-button_send_to_sms = Button(frame_sms, text='Send to SMS',
+button_send_to_sms = Button(frame_sms, text=send_to_sms_button,
                             command=lambda: send_mail(mail_to_sms, clipboard_SMS_txt))
 
-button_enter = Button(frame_left_entries, text="Enter", command=creating_user_text, underline=0)
+button_enter = Button(frame_left_entries, text=enter_button, command=creating_user_text, underline=0)
 
-button_delete = Button(frame_left_entries, text="Delete all", command=del_text, underline=0)
+button_delete = Button(frame_left_entries, text=delete_all_button, command=del_text, underline=0)
 style = Style()
 style.map('TButton',
           foreground=[('!active', 'purple'),

@@ -42,45 +42,45 @@ def is_empty(string: str):
     return bool(string)
 
 
-def string_check(string: str):
-    """
-    Checking variables label_first_name and label_last_name
-    :param string: The string to validate entered by the user
-    :return: return 0 if validation failed
-    """
-    if not is_alpha(string.strip()):
-        messagebox.showerror("Error", f"{label_first_name}или {label_last_name}- cодержат ошибку!")
-        return 0
+# def string_check(string: str):
+#     """
+#     Checking variables label_first_name and label_last_name
+#     :param string: The string to validate entered by the user
+#     :return: return 0 if validation failed
+#     """
+#     if not is_alpha(string.strip()):
+#         messagebox.showerror("Error", f"{label_first_name}или {label_last_name}- cодержат ошибку!")
+#         return 0
 
 
-def numeric_check(string: str):
-    """
-    Checking variables label_personal_id
-    :param string: The string to validate entered by the user
-    :return: return 0 if validation failed
-    """
-    if not is_numeric(string):
-        messagebox.showerror("Error", f"{label_personal_id}- cодержит ошибку!")
-        return 0
+# def numeric_check(string: str):
+#     """
+#     Checking variables label_personal_id
+#     :param string: The string to validate entered by the user
+#     :return: return 0 if validation failed
+#     """
+#     if not is_numeric(string):
+#         messagebox.showerror("Error", f"{label_personal_id}- cодержит ошибку!")
+#         return 0
 
 
-def login_tht_check(string: str):
-    """
-    Checking variables label_ester_login and label_tht_code
-    :param string: The string to validate entered by the user
-    :return: return 0 if validation failed
-    """
-    if not is_alnum(string):
-        messagebox.showerror("Error", f"{label_ester_login}или {label_tht_code}- cодержат ошибку!")
-        return 0
+# def login_tht_check(string: str):
+#     """
+#     Checking variables label_ester_login and label_tht_code
+#     :param string: The string to validate entered by the user
+#     :return: return 0 if validation failed
+#     """
+#     if not is_alnum(string):
+#         messagebox.showerror("Error", f"{label_ester_login}или {label_tht_code}- cодержат ошибку!")
+#         return 0
 
 
-def checking_emty_string(string: str):
-    """
-    Checking variables label_additional_info and label_phone_number
-    :param string: The string to validate entered by the user
-    :return: return 0 if validation failed
-    """
-    if not is_empty(string):
-        messagebox.showerror("Error", f"{label_additional_info}или {label_phone_number}- пустые!")
-        return 0
+# def checking_emty_string(string: str):
+#     """
+#     Checking variables label_additional_info and label_phone_number
+#     :param string: The string to validate entered by the user
+#     :return: return 0 if validation failed
+#     """
+#     if not is_empty(string):
+#         messagebox.showerror("Error", f"{label_additional_info}или {label_phone_number}- пустые!")
+#         return 0
