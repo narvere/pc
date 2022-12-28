@@ -4,6 +4,7 @@ import ssl
 import smtplib
 import dotenv
 import tkinter.messagebox as messagebox
+# assert 'SYSTEMROOT' in os.environ
 
 
 def show_info():
@@ -33,9 +34,10 @@ def send_mail(email_receiver, clipboard_text):
     #     smtp.login(email_sender, email_password)
     #     smtp.sendmail(email_sender, email_receiver, em.as_string())
     #     print("Start2!")
+    print(os.environ["EMAIL_SENDER"])
     try:
-        with smtplib.SMTP_SSL('mail.narvahaigla.ee', 465, context=context) as smtp:
-            # print(email_sender, email_password)
+        with smtplib.SMTP_SSL(os.environ["MAIL_SERVER"], 465, context=context) as smtp:
+            print(email_sender, email_password)
             smtp.login(user=email_sender, password=email_password)
             smtp.sendmail(from_addr=email_sender, to_addrs=[email_receiver, 'deniss.hohlov@gmail.com'],
                           msg=em.as_string())

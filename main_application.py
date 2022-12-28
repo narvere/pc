@@ -79,6 +79,10 @@ def creating_user_text(*event):
     print_sms_method(ester_pass, first_name_speller, last_name_speller, pc_login, pc_pass, zimbra_pass)
 
 
+clipboard_SMS_txt = ""
+clipboard_keepass_text = ""
+
+
 def clipboard_adding():
     """
     Text generation for clipboard saving
@@ -88,6 +92,7 @@ def clipboard_adding():
         last_surname, pc_login, pc_pass, personal_id, phone_number, tht_code, zimbra_mail, \
         zimbra_pass, zimbra_mail_sms = generate_message_variables()
     # Save to clipboard SMS text
+    global clipboard_SMS_txt, clipboard_keepass_text
     clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}" \
                         f"{ester_login}\n" \
                         f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail_sms}\n" \
@@ -250,7 +255,7 @@ def open_new_window():
     """
     # Create the new window
     new_window = Toplevel(root)
-    new_window.geometry(setup_window)
+    new_window.geometry(setup_window_geometry)
 
     # Create Tkinter variables to track the state of the checkboxes
     checkbox1_var = IntVar()
@@ -297,12 +302,12 @@ def open_new_window():
 Создание экземпляра Butoon 
 """
 button_setup = Button(frame_right_setup, text=setup_button, command=open_new_window)
-button_copy_to_alex = Button(frame_alex, text=copy_to_alex_button,
+button_copy_to_alex = Button(frame_alex, text=copy_to_keepass_button,
                              command=lambda: copy_to_clipboard(clipboard_keepass_text))
 button_copy_to_sms = Button(frame_sms, text=copy_to_sms_button, command=lambda: copy_to_clipboard(clipboard_SMS_txt))
 
 button_send_to_alex = Button(frame_alex, text=send_to_alex_button,
-                             command=lambda: send_mail(mail_to_alex, clipboard_keepass_text))
+                             command=lambda: send_mail(mail_to_keepass, clipboard_keepass_text))
 button_send_to_sms = Button(frame_sms, text=send_to_sms_button,
                             command=lambda: send_mail(mail_to_sms, clipboard_SMS_txt))
 
@@ -355,6 +360,17 @@ entry_alex.insert(END, 'deniss.hohlov@gmail.com')
 entry_SMS = Entry(frame_sms, width=30)
 entry_SMS.insert(END, 'deniss.hohlov@gmail.com')
 
+# DEMO info
+entry_name.insert(END, 'deniss')
+entry_surname.insert(END, 'hohlov')
+entry_ester.insert(END, 'a7272')
+entry_personal_id.insert(END, '38410103729')
+entry_tht_code.insert(END, 'd00077')
+entry_phone.insert(END, '55944212')
+entry_info.insert(END, 'it-mees')
+
+
+#
 
 # lb_name_print.grid(row=9, column=3)
 
