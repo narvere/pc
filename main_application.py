@@ -1,6 +1,6 @@
-from tkinter import Tk, END, Text, Label, Frame, LabelFrame, Toplevel, IntVar, Checkbutton
+from tkinter import Tk, END, Text, Label, Frame, LabelFrame, Toplevel, IntVar, Checkbutton, Menu
 from tkinter.ttk import Entry, Button, Style
-
+import sqlite3
 import variables
 from variables import *
 from pass_generator import pass_gen, eesti_speller
@@ -15,13 +15,30 @@ root.geometry(main_window_geometry)
 root.resizable(width=False, height=False)
 root.title(title)
 
+# Connect to the database
+conn = sqlite3.connect('database.db')
+
+# Create a cursor
+cursor = conn.cursor()
+
+"""
+Menu creation
+"""
+menu_bar = Menu(root)
+
+
+def some_callback_function():
+    print("Button pressed")
+
+
 """
 Создание экземпляра Frame и LabelFrame 
 """
-frame_alex = LabelFrame(root, text=keepass_frame)
-frame_sms = LabelFrame(root, text=sms_frame)
+
 frame_left_entries = Frame(root)
 frame_right_setup = Frame(root)
+frame_keepass = LabelFrame(root, text=keepass_frame)
+frame_sms = LabelFrame(root, text=sms_frame)
 
 
 def del_text(*event):
@@ -51,22 +68,22 @@ def creating_user_text(*event):
     :param event: event method is using for hot keys
     :return:
     """
-    if not entry_name.get().isalpha() and not entry_name.get().isalnum():
+    if not entry_name.get().strip().isalpha() and not entry_name.get().strip().isalnum():
         error(label_first_name)
         return 0
-    if not entry_surname.get().isalpha() and not entry_surname.get().isalnum():
+    if not entry_surname.get().strip().isalpha() and not entry_surname.get().strip().isalnum():
         error(label_last_name)
         return 0
-    if not entry_ester.get().isalnum():
+    if not entry_ester.get().strip().isalnum():
         error(label_ester_login)
         return 0
-    if not ikood(entry_personal_id.get()):
+    if not ikood(entry_personal_id.get().strip()):
         error(label_personal_id)
         return 0
-    if not bool(entry_phone.get()):
+    if not bool(entry_phone.get().strip()):
         error(label_phone_number)
         return 0
-    if not bool(entry_info.get()):
+    if not bool(entry_info.get().strip()):
         error(label_additional_info)
         return 0
     ester_pass, first_name, first_name_speller, last_name_speller, \
@@ -241,6 +258,7 @@ def creating_hotkeys():
     """
     root.bind('<Control-e>', creating_user_text)
     root.bind('<Control-d>', del_text)
+
     # root.bind('<Control-a>', lambda: gtc(clipboard_text))
     # root.bind('<Control-s>', lambda: gtc(clipboard_SMS))
 
@@ -248,7 +266,7 @@ def creating_hotkeys():
 creating_hotkeys()
 
 
-def open_new_window():
+def open_new_window(*event):
     """
     New window creation
     :return:
@@ -256,16 +274,21 @@ def open_new_window():
     # Create the new window
     new_window = Toplevel(root)
     new_window.geometry(setup_window_geometry)
+    new_window.title("Setup - NH admin tool")
+    frame_setup = Frame(new_window)
+    frame_setup.grid(row=0, column=0, columnspan=3, sticky="w", pady=10, padx=10)
 
     # Create Tkinter variables to track the state of the checkboxes
     checkbox1_var = IntVar()
     checkbox2_var = IntVar()
 
-    entry_to_database = Entry(new_window)
+    entry_to_database = Entry(frame_setup)
 
     # Create checkbox widgets
-    checkbox1 = Checkbutton(new_window, text=variables.keepass_frame, variable=checkbox1_var, onvalue=1, offvalue=0)
-    checkbox2 = Checkbutton(new_window, text=variables.sms_frame, variable=checkbox2_var, onvalue=1, offvalue=0)
+    checkbox1_keepass = Checkbutton(frame_setup, text=variables.keepass_frame, variable=checkbox1_var, onvalue=1,
+                                    offvalue=0)
+    checkbox2_sms = Checkbutton(frame_setup, text=variables.sms_frame, variable=checkbox2_var, onvalue=1, offvalue=0)
+    fetching_data(frame_setup)
 
     def process_inputs():
         """
@@ -276,15 +299,22 @@ def open_new_window():
         if not is_empty(entry_string):
             raise ValueError("String is empty")
 
-        checkbox1_state = checkbox1_var.get()
-        checkbox2_state = checkbox2_var.get()
-        if not any([checkbox1_state, checkbox2_state]):
+        checkbox1_state_keepass = checkbox1_var.get()
+        checkbox2_state_sms = checkbox2_var.get()
+        if not any([checkbox1_state_keepass, checkbox2_state_sms]):
             raise ValueError("No checkboxes selected")
-        label_add_mail = Label(new_window, text=f"{entry_string}, {checkbox1_state}, {checkbox2_state}")
-        label_add_mail.grid(row=1, column=0, sticky="w")
+
         entry_to_database.delete(0, END)
-        checkbox1.deselect()
-        print(entry_string, checkbox1_state, checkbox2_state)
+        checkbox1_keepass.deselect()
+        checkbox2_sms.deselect()
+        # print(entry_string, checkbox1_state_keepass, checkbox2_state_sms)
+        # Insert a row of data
+        cursor.execute("INSERT INTO users (email, keepass, sms) VALUES (?, ?, ?)",
+                       (entry_string, checkbox1_state_keepass, checkbox2_state_sms))
+
+        # Commit the changes
+        conn.commit()
+        fetching_data(frame_setup)
 
     # Create Add button
     button_add = Button(new_window, text=add_button, command=process_inputs)
@@ -293,20 +323,37 @@ def open_new_window():
 
     entry_to_database.grid(row=0, column=0, ipadx=entry_len)
     # Pack the checkbox widgets
-    checkbox1.grid(row=0, column=1)
-    checkbox2.grid(row=0, column=2)
+    checkbox1_keepass.grid(row=0, column=1)
+    checkbox2_sms.grid(row=0, column=2)
     button_add.grid(row=0, column=3)
+
+
+def fetching_data(frame_setup):
+    # Select all rows from the table
+    cursor.execute("SELECT * FROM users")
+    # Fetch the rows
+    rows = cursor.fetchall()
+    # Print the rows
+    for row in rows:
+        mail = row[1]
+        keepass = row[2]
+        sms = row[3]
+        print(row)
+
+        # label_add_mail = Label(frame_setup, text=f"{entry_string}, {checkbox1_state_keepass}, {checkbox2_state_sms}")
+        label_add_mail = Label(frame_setup, text=f"{mail}, {keepass}, {sms}")
+        label_add_mail.grid(row=row[0], column=0, sticky="w")
 
 
 """
 Создание экземпляра Butoon 
 """
 button_setup = Button(frame_right_setup, text=setup_button, command=open_new_window)
-button_copy_to_alex = Button(frame_alex, text=copy_to_keepass_button,
+button_copy_to_alex = Button(frame_keepass, text=copy_to_keepass_button,
                              command=lambda: copy_to_clipboard(clipboard_keepass_text))
 button_copy_to_sms = Button(frame_sms, text=copy_to_sms_button, command=lambda: copy_to_clipboard(clipboard_SMS_txt))
 
-button_send_to_alex = Button(frame_alex, text=send_to_alex_button,
+button_send_to_alex = Button(frame_keepass, text=send_to_alex_button,
                              command=lambda: send_mail(mail_to_keepass, clipboard_keepass_text))
 button_send_to_sms = Button(frame_sms, text=send_to_sms_button,
                             command=lambda: send_mail(mail_to_sms, clipboard_SMS_txt))
@@ -340,7 +387,7 @@ label_tht_kood = Label(frame_left_entries, text=label_tht_code, width=12, anchor
 """
 Создание экземпляра Text 
 """
-text_text = Text(frame_alex, width=text_width, height=text_height)
+text_text = Text(frame_keepass, width=text_width, height=text_height)
 text_SMS = Text(frame_sms, width=text_width, height=6)
 
 """
@@ -355,7 +402,7 @@ entry_personal_id = Entry(frame_left_entries)
 entry_tht_code = Entry(frame_left_entries)
 entry_phone = Entry(frame_left_entries)
 entry_info = Entry(frame_left_entries)
-entry_alex = Entry(frame_alex, width=30)
+entry_alex = Entry(frame_keepass, width=30)
 entry_alex.insert(END, 'deniss.hohlov@gmail.com')
 entry_SMS = Entry(frame_sms, width=30)
 entry_SMS.insert(END, 'deniss.hohlov@gmail.com')
@@ -403,7 +450,7 @@ def keepass_frame():
     """
     To Alex
     """
-    frame_alex.grid(row=4, column=0, columnspan=3, padx=10)
+    frame_keepass.grid(row=4, column=0, columnspan=3, padx=10)
     text_text.grid(row=0, column=0, rowspan=11, sticky="we")
     button_send_to_alex.grid(row=0, column=1, ipadx=10, ipady=5, sticky="we")
     button_copy_to_alex.grid(row=1, column=1, ipadx=10, ipady=5, sticky="we")
@@ -438,4 +485,21 @@ def copy_to_clipboard(clipboard_text, *event):
     root.clipboard_append(clipboard_text)
 
 
+def show_menu_bar(*event):
+    menu_bar.pack(side="top", fill="x")
+
+
+# Create a File menu
+file_menu = Menu(menu_bar, tearoff=0)
+file_menu.add_command(label="Setup", command=open_new_window, accelerator="Ctrl+F")
+# file_menu.add_command(label="Save", command=some_callback_function)
+file_menu.add_separator()
+file_menu.add_command(label="Exit", command=root.quit)
+
+# Add the File menu to the menu bar
+menu_bar.add_cascade(label="File", menu=file_menu)
+root.bind('<Control-f>', open_new_window)
+# root.bind_all("<Control-m>", show_menu_bar)
+# Set the menu bar as the window menu
+root.config(menu=menu_bar)
 root.mainloop()

@@ -5,11 +5,11 @@ entry_len = 40
 
 # Mailing and SMS configurations
 
-mail_to_keepass = "deniss.hohlov@narvahaigla.ee"
-mail_to_sms = "deniss.hohlov@narvahaigla.ee"
+# mail_to_keepass = "deniss.hohlov@narvahaigla.ee"
+# mail_to_sms = "deniss.hohlov@narvahaigla.ee"
 
-# mail_to_alex = "alexey.bystrov@narvahaigla.ee"
-# mail_to_sms = "sergei.zaitsev@narvahaigla.ee"
+mail_to_keepass = "alexey.bystrov@narvahaigla.ee"
+mail_to_sms = "sergei.zaitsev@narvahaigla.ee"
 
 label_first_name = "Nimi: "
 label_last_name = "Perekonnanimi: "
@@ -21,13 +21,13 @@ label_tht_code = "THT code: "
 label_pc_login = "Arvuti login: "
 label_pc_pass = "Arvuti pass: "
 label_ester_pass = "Ester pass: "
-label_zimbra_mail = "Zimbra: "
+label_zimbra_mail = "Zimbra mail: "
 label_zimbra_pass = "Zimbra pass: "
 # clipboard_keepass_text = ""
 # clipboard_SMS_txt = ""
 main_window_geometry = "630x600+600+200"
 setup_window_geometry = "500x250"
-title = "Narva Haigla tool by Deniss Hohlov"
+title = "NH admin tool"
 sms_frame = "SMS"
 keepass_frame = "KeePass"
 mail = "@narvahaigla.ee"
