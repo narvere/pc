@@ -7,6 +7,7 @@ from pass_generator import pass_gen, eesti_speller
 from mail_engine import send_mail
 import tkinter.messagebox as messagebox
 from isikukood import ikood
+import re
 
 from validators import is_empty
 
@@ -62,18 +63,24 @@ def error(err):
     return messagebox.showerror("Error!", f"Поле {err[:-2]} - cодержит ошибку!")
 
 
+def error_setup(err):
+    return messagebox.showerror("Error!", f"Поле cодержит ошибку: {err}!")
+
+
 def creating_user_text(*event):
     """
     Getting validated user text, sending to clipboard, keepass and SMS functions
     :param event: event method is using for hot keys
     :return:
     """
-    if not entry_name.get().strip().isalpha() and not entry_name.get().strip().isalnum():
-        error(label_first_name)
-        return 0
-    if not entry_surname.get().strip().isalpha() and not entry_surname.get().strip().isalnum():
-        error(label_last_name)
-        return 0
+    if "-" not in entry_name.get().strip():
+        if not entry_name.get().strip().isalpha() and not entry_name.get().strip().isalnum():
+            error(label_first_name)
+            return 0
+    if "-" not in entry_surname.get().strip():
+        if not entry_surname.get().strip().isalpha() and not entry_surname.get().strip().isalnum():
+            error(label_last_name)
+            return 0
     if not entry_ester.get().strip().isalnum():
         error(label_ester_login)
         return 0
@@ -293,20 +300,57 @@ def open_new_window(*event):
     checkbox2_sms = Checkbutton(frame_setup, text=variables.sms_frame, variable=checkbox2_var, onvalue=1, offvalue=0)
     fetching_data(frame_setup)
 
+    def is_valid_email(email):
+
+        # Use the fullmatch() function to check if the email address matches the regular expression
+        if re.fullmatch(email_regex, email):
+            print(re.fullmatch(email_regex, email))
+            return True
+        else:
+            return False
+
     def process_inputs():
         """
         Button Add engine
         :return:
         """
         entry_string = entry_to_database.get()
+
+        if not is_valid_email(entry_string):
+            error_setup("Wrong email")
+            return 0
+
+        print(entry_string)
         if not is_empty(entry_string):
-            raise ValueError("String is empty")
+            error_setup("String is empty")
+            return 0
+            # raise ValueError("String is empty")
 
         checkbox1_state_keepass = checkbox1_var.get()
         checkbox2_state_sms = checkbox2_var.get()
+        # Подключаемся к базе данных
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
         if not any([checkbox1_state_keepass, checkbox2_state_sms]):
-            raise ValueError("No checkboxes selected")
+            error_setup("No checkboxes selected")
+            return 0
+            # raise ValueError("No checkboxes selected")
+        if checkbox1_state_keepass == 1:
 
+            # Ищем строку с определенным ID
+            cursor.execute("SELECT * FROM users WHERE keepass=?", (1,))
+            row = cursor.fetchone()
+            if bool(row):
+                error_setup("keepass user уже зарегистрирован")
+                return 0
+        if checkbox2_state_sms == 1:
+
+            # Ищем строку с определенным ID
+            cursor.execute("SELECT * FROM users WHERE sms=?", (1,))
+            row = cursor.fetchone()
+            if bool(row):
+                error_setup("SMS user уже зарегистрирован")
+                return 0
         entry_to_database.delete(0, END)
         checkbox1_keepass.deselect()
         checkbox2_sms.deselect()
@@ -346,7 +390,6 @@ def del_str(nr):
 
 
 def fetching_data(frame_setup):
-
     # Select all rows from the table
     cursor.execute("SELECT * FROM users")
 

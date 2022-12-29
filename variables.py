@@ -38,3 +38,5 @@ send_to_alex_button = 'Send to Alex'
 send_to_sms_button = 'Send to SMS'
 enter_button = "Enter"
 delete_all_button = "Delete all"
+# Define the regular expression for an email address
+email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
