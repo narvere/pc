@@ -18,19 +18,12 @@ root.title(title)
 
 # Connect to the database
 conn = sqlite3.connect('database.db')
-
-# Create a cursor
 cursor = conn.cursor()
 
 """
 Menu creation
 """
 menu_bar = Menu(root)
-
-
-def some_callback_function():
-    print("Button pressed")
-
 
 """
 Создание экземпляра Frame и LabelFrame 
@@ -120,7 +113,7 @@ def clipboard_adding():
     clipboard_SMS_txt = f"{label_pc_login}{pc_login}\n{label_pc_pass}{pc_pass}\n{label_ester_login}" \
                         f"{ester_login}\n" \
                         f"{label_ester_pass}{ester_pass}\n{label_zimbra_mail}{zimbra_mail_sms}\n" \
-                        f"{label_zimbra_pass}{zimbra_pass} "
+                        f"{label_zimbra_pass}{zimbra_pass}\n{label_phone_number}{phone_number}"
     # Save to clipboard KeePass text
     clipboard_keepass_text = f"{label_first_name}{first_name} {last_surname} / {first_name_speller} " \
                              f"{last_name_speller} " \
@@ -246,7 +239,6 @@ def generate_message_variables():
 
     # Extract additional info
     additional_info = entry_info.get()
-    # name_print["text"] = nimi + first_name + " " + last_surname + '\n'
     return additional_info, ester_login, ester_pass, first_name, first_name_spelling, \
         last_name_spelling, last_surname, pc_login, pc_pass, personal_id, phone_number, \
         tht_code, zimbra_mail, zimbra_pass, zimbra_mail_sms
@@ -275,7 +267,7 @@ def creating_hotkeys():
 creating_hotkeys()
 
 
-def open_new_window(*event):
+def open_setup_window(*event):
     """
     New window creation
     :return:
@@ -304,12 +296,11 @@ def open_new_window(*event):
 
         # Use the fullmatch() function to check if the email address matches the regular expression
         if re.fullmatch(email_regex, email):
-            print(re.fullmatch(email_regex, email))
             return True
         else:
             return False
 
-    def process_inputs():
+    def new_email_adding():
         """
         Button Add engine
         :return:
@@ -320,7 +311,6 @@ def open_new_window(*event):
             error_setup("Wrong email")
             return 0
 
-        print(entry_string)
         if not is_empty(entry_string):
             error_setup("String is empty")
             return 0
@@ -328,9 +318,7 @@ def open_new_window(*event):
 
         checkbox1_state_keepass = checkbox1_var.get()
         checkbox2_state_sms = checkbox2_var.get()
-        # Подключаемся к базе данных
-        conn = sqlite3.connect("database.db")
-        cursor = conn.cursor()
+
         if not any([checkbox1_state_keepass, checkbox2_state_sms]):
             error_setup("No checkboxes selected")
             return 0
@@ -354,7 +342,6 @@ def open_new_window(*event):
         entry_to_database.delete(0, END)
         checkbox1_keepass.deselect()
         checkbox2_sms.deselect()
-        # print(entry_string, checkbox1_state_keepass, checkbox2_state_sms)
         # Insert a row of data
         cursor.execute("INSERT INTO users (email, keepass, sms) VALUES (?, ?, ?)",
                        (entry_string, checkbox1_state_keepass, checkbox2_state_sms))
@@ -364,7 +351,7 @@ def open_new_window(*event):
         fetching_data(frame_setup)
 
     # Create Add button
-    button_add = Button(new_window, text=add_email_button, command=process_inputs)
+    button_add = Button(new_window, text=add_email_button, command=new_email_adding)
 
     # Create a label widget and add it to the new window
 
@@ -376,13 +363,11 @@ def open_new_window(*event):
 
 
 def del_str(nr):
-    print(nr)
     # Delete a row with a specific id
     cursor.execute("DELETE FROM users WHERE id=?", (nr,))
 
     # Commit the changes
     conn.commit()
-
     fetching_data(frame_setup)
 
     # Close the connection
@@ -401,7 +386,6 @@ def fetching_data(frame_setup):
         mail = row[1]
         keepass = row[2]
         sms = row[3]
-        print(row)
 
         # label_add_mail = Label(frame_setup, text=f"{entry_string}, {checkbox1_state_keepass}, {checkbox2_state_sms}")
         label_add_mail = Label(frame_setup, text=f"{mail}, KeePass - {keepass}, SMS - {sms}")
@@ -413,15 +397,15 @@ def fetching_data(frame_setup):
 """
 Создание экземпляра Butoon 
 """
-button_setup = Button(frame_right_setup, text=setup_button, command=open_new_window)
+button_setup = Button(frame_right_setup, text=setup_button, command=open_setup_window)
 button_copy_to_alex = Button(frame_keepass, text=copy_to_keepass_button,
                              command=lambda: copy_to_clipboard(clipboard_keepass_text))
 button_copy_to_sms = Button(frame_sms, text=copy_to_sms_button, command=lambda: copy_to_clipboard(clipboard_SMS_txt))
 
 button_send_to_alex = Button(frame_keepass, text=send_to_alex_button,
-                             command=lambda: send_mail(mail_to_keepass, clipboard_keepass_text))
+                             command=lambda: send_mail(keepass[1], clipboard_keepass_text))
 button_send_to_sms = Button(frame_sms, text=send_to_sms_button,
-                            command=lambda: send_mail(mail_to_sms, clipboard_SMS_txt))
+                            command=lambda: send_mail(sms[1], clipboard_SMS_txt))
 
 button_enter = Button(frame_left_entries, text=enter_button, command=creating_user_text, underline=0)
 
@@ -467,19 +451,29 @@ entry_personal_id = Entry(frame_left_entries)
 entry_tht_code = Entry(frame_left_entries)
 entry_phone = Entry(frame_left_entries)
 entry_info = Entry(frame_left_entries)
-entry_alex = Entry(frame_keepass, width=30)
-entry_alex.insert(END, 'deniss.hohlov@gmail.com')
-entry_SMS = Entry(frame_sms, width=30)
-entry_SMS.insert(END, 'deniss.hohlov@gmail.com')
+
+# Ищем строку с определенным ID
+cursor.execute("SELECT * FROM users WHERE keepass=?", (1,))
+keepass = cursor.fetchone()
+cursor.execute("SELECT * FROM users WHERE sms=?", (1,))
+sms = cursor.fetchone()
+
+if keepass or sms:
+    entry_alex = Label(frame_keepass, text=keepass[1])
+    entry_SMS = Label(frame_sms, text=sms[1])
+else:
+    entry_alex = Label(frame_keepass, text="None")
+    entry_SMS = Label(frame_sms, text="None")
+
 
 # DEMO info
-entry_name.insert(END, 'deniss')
-entry_surname.insert(END, 'hohlov')
-entry_ester.insert(END, 'a7272')
-entry_personal_id.insert(END, '38410103729')
-entry_tht_code.insert(END, 'd00077')
-entry_phone.insert(END, '55944212')
-entry_info.insert(END, 'it-mees')
+# entry_name.insert(END, 'deniss')
+# entry_surname.insert(END, 'hohlov')
+# entry_ester.insert(END, 'a7272')
+# entry_personal_id.insert(END, '38410103729')
+# entry_tht_code.insert(END, 'd00077')
+# entry_phone.insert(END, '55944212')
+# entry_info.insert(END, 'it-mees')
 
 
 #
@@ -508,7 +502,7 @@ def fight_frame():
     Right frame
     """
     frame_right_setup.grid(row=0, column=2)
-    button_setup.grid(row=0, column=0)
+    # button_setup.grid(row=0, column=0)
 
 
 def keepass_frame():
@@ -517,8 +511,8 @@ def keepass_frame():
     """
     frame_keepass.grid(row=4, column=0, columnspan=3, padx=10)
     text_text.grid(row=0, column=0, rowspan=11, sticky="we")
-    button_send_to_alex.grid(row=0, column=1, ipadx=10, ipady=5, sticky="we")
-    button_copy_to_alex.grid(row=1, column=1, ipadx=10, ipady=5, sticky="we")
+    button_send_to_alex.grid(row=1, column=1, ipadx=10, ipady=5, sticky="we")
+    button_copy_to_alex.grid(row=0, column=1, ipadx=10, ipady=5, sticky="we")
     entry_alex.grid(row=2, column=1, sticky="we", padx=10)
 
 
@@ -528,8 +522,8 @@ def sms_frame():
     """
     frame_sms.grid(row=9, column=0, columnspan=3, pady=10)
     text_SMS.grid(row=0, column=0, rowspan=6, sticky="we")
-    button_send_to_sms.grid(row=0, column=1, ipadx=10, ipady=5, sticky="we")
-    button_copy_to_sms.grid(row=1, column=1, ipadx=10, ipady=5, sticky="we")
+    button_send_to_sms.grid(row=1, column=1, ipadx=10, ipady=5, sticky="we")
+    button_copy_to_sms.grid(row=0, column=1, ipadx=10, ipady=5, sticky="we")
     entry_SMS.grid(row=2, column=1, padx=10, sticky="we")
 
 
@@ -556,15 +550,16 @@ def show_menu_bar(*event):
 
 # Create a File menu
 file_menu = Menu(menu_bar, tearoff=0)
-file_menu.add_command(label="Setup", command=open_new_window, accelerator="Ctrl+F")
+file_menu.add_command(label="Setup", command=open_setup_window, accelerator="Ctrl+F")
 # file_menu.add_command(label="Save", command=some_callback_function)
 file_menu.add_separator()
 file_menu.add_command(label="Exit", command=root.quit)
 
 # Add the File menu to the menu bar
 menu_bar.add_cascade(label="File", menu=file_menu)
-root.bind('<Control-f>', open_new_window)
+root.bind('<Control-f>', open_setup_window)
 # root.bind_all("<Control-m>", show_menu_bar)
 # Set the menu bar as the window menu
 root.config(menu=menu_bar)
+# conn.close()
 root.mainloop()
