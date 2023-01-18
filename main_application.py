@@ -482,20 +482,27 @@ entry_ester_pass_upd = Entry(frame_update)
 entry_zimbra_mail_upd = Entry(frame_update)
 entry_zimbra_pass_upd = Entry(frame_update)
 
-# Ищем строку с определенным ID
-try:
-    cursor.execute("SELECT * FROM users WHERE keepass=?", (1,))
-    keepass = cursor.fetchone()
-    cursor.execute("SELECT * FROM users WHERE sms=?", (1,))
-    sms = cursor.fetchone()
-except(Exception):
-    pass
-if keepass or sms:
-    entry_alex = Label(frame_keepass, text=keepass[1])
-    entry_SMS = Label(frame_sms, text=sms[1])
-else:
-    entry_alex = Label(frame_keepass, text="None")
-    entry_SMS = Label(frame_sms, text="None")
+
+def keepass_fob_db():
+    global keepass, sms, entry_alex, entry_SMS
+    # Ищем строку с определенным ID
+    try:
+        cursor.execute("SELECT * FROM users WHERE keepass=?", (1,))
+        keepass = cursor.fetchone()
+        cursor.execute("SELECT * FROM users WHERE sms=?", (1,))
+        sms = cursor.fetchone()
+    except Exception as e:
+        print(f"Error retrieving data from the database: {e}")
+    if keepass or sms:
+        entry_alex = Label(frame_keepass, text=keepass[1])
+        entry_SMS = Label(frame_sms, text=sms[1])
+    else:
+        entry_alex = Label(frame_keepass, text="None")
+        entry_SMS = Label(frame_sms, text="None")
+
+
+keepass_fob_db()
+
 
 # DEMO info
 # entry_name.insert(END, 'deniss')
