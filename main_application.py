@@ -29,11 +29,11 @@ menu_bar = Menu(root)
 Создание экземпляра Frame и LabelFrame 
 """
 
-frame_left_entries = Frame(root, background="brown")
-frame_right_setup = Frame(root, background="purple")
-frame_keepass = LabelFrame(root, text=keepass_frame, background="red")
-frame_sms = LabelFrame(root, text=sms_frame, background="blue")
-frame_update = LabelFrame(root, text="Update old user", background="yellow")
+frame_left_entries = Frame(root)
+frame_right_setup = Frame(root)
+frame_keepass = LabelFrame(root, text=keepass_frame)
+frame_sms = LabelFrame(root, text=sms_frame)
+frame_update = LabelFrame(root, text=update_label_text)
 
 
 def del_text(*event):
@@ -299,7 +299,7 @@ def open_setup_window(*event):
     # Create the new window
     new_window = Toplevel(root)
     new_window.geometry(setup_window_geometry)
-    new_window.title("Setup - NH admin tool")
+    new_window.title(admin_tool_title)
     frame_setup = Frame(new_window)
     frame_setup.grid(row=0, column=0, columnspan=3, sticky="w", pady=10, padx=10)
 
@@ -331,11 +331,11 @@ def open_setup_window(*event):
         entry_string = entry_to_database.get()
 
         if not is_valid_email(entry_string):
-            error_setup("Wrong email")
+            error_setup(email_error_msg)
             return 0
 
         if not is_empty(entry_string):
-            error_setup("String is empty")
+            error_setup(smpty_string_msg)
             return 0
             # raise ValueError("String is empty")
 
@@ -343,7 +343,7 @@ def open_setup_window(*event):
         checkbox2_state_sms = checkbox2_var.get()
 
         if not any([checkbox1_state_keepass, checkbox2_state_sms]):
-            error_setup("No checkboxes selected")
+            error_setup(checkbox_msg)
             return 0
             # raise ValueError("No checkboxes selected")
         if checkbox1_state_keepass == 1:
@@ -352,7 +352,7 @@ def open_setup_window(*event):
             cursor.execute("SELECT * FROM users WHERE keepass=?", (1,))
             row = cursor.fetchone()
             if bool(row):
-                error_setup("keepass user уже зарегистрирован")
+                error_setup(keepass_msg)
                 return 0
         if checkbox2_state_sms == 1:
 
@@ -360,7 +360,7 @@ def open_setup_window(*event):
             cursor.execute("SELECT * FROM users WHERE sms=?", (1,))
             row = cursor.fetchone()
             if bool(row):
-                error_setup("SMS user уже зарегистрирован")
+                error_setup(sms_msg)
                 return 0
         entry_to_database.delete(0, END)
         checkbox1_keepass.deselect()
@@ -452,11 +452,11 @@ label_ik = Label(frame_left_entries, text=label_personal_id, width=12, anchor="w
 label_phone = Label(frame_left_entries, text=label_phone_number, width=12, anchor="w")
 label_info = Label(frame_left_entries, text=label_additional_info, width=12, anchor="w")
 label_tht_kood = Label(frame_left_entries, text=label_tht_code, width=12, anchor="w")
-label_arvuti_login = Label(frame_update, text="Arvuti login:", width=12, anchor="w")
-label_arvuti_pass = Label(frame_update, text="Arvuti pass:", width=12, anchor="w")
-label_ester_pass_upd = Label(frame_update, text="Ester pass:", width=12, anchor="w")
-label_zimbra_mail_upd = Label(frame_update, text="Zimbra mail:", width=12, anchor="w")
-label_zimbra_pass_upd = Label(frame_update, text="Zimbra pass:", width=12, anchor="w")
+label_arvuti_login_upd = Label(frame_update, text=label_arvuti_login_upd_a, width=12, anchor="w")
+label_arvuti_pass_upd = Label(frame_update, text=label_arvuti_pass_upd_a, width=12, anchor="w")
+label_ester_pass_upd = Label(frame_update, text=label_ester_pass_upd_a, width=12, anchor="w")
+label_zimbra_mail_upd = Label(frame_update, text=label_zimbra_mail_upd_a, width=12, anchor="w")
+label_zimbra_pass_upd = Label(frame_update, text=label_zimbra_pass_upd_a, width=12, anchor="w")
 
 """
 Создание экземпляра Text 
@@ -498,13 +498,13 @@ else:
     entry_SMS = Label(frame_sms, text="None")
 
 # DEMO info
-entry_name.insert(END, 'deniss')
-entry_surname.insert(END, 'hohlov')
-entry_ester.insert(END, 'a7272')
-entry_personal_id.insert(END, '38410103729')
-entry_tht_code.insert(END, 'd00077')
-entry_phone.insert(END, '55944212')
-entry_info.insert(END, 'it-mees')
+# entry_name.insert(END, 'deniss')
+# entry_surname.insert(END, 'hohlov')
+# entry_ester.insert(END, 'a7272')
+# entry_personal_id.insert(END, '38410103729')
+# entry_tht_code.insert(END, 'd00077')
+# entry_phone.insert(END, '55944212')
+# entry_info.insert(END, 'it-mees')
 
 
 #
@@ -529,10 +529,14 @@ def left_frame():
 
 
 def update_frame():
+    """
+    Frame for additional information for old employ
+    :return:
+    """
     frame_update.grid(row=0, column=1, columnspan=3, sticky="ne", pady=10, padx=10)
 
-    label_arvuti_login.grid(row=0, column=0, sticky="w")
-    label_arvuti_pass.grid(row=1, column=0, sticky="w")
+    label_arvuti_login_upd.grid(row=0, column=0, sticky="w")
+    label_arvuti_pass_upd.grid(row=1, column=0, sticky="w")
     label_ester_pass_upd.grid(row=2, column=0, sticky="w")
     label_zimbra_mail_upd.grid(row=3, column=0, sticky="w")
     label_zimbra_pass_upd.grid(row=4, column=0, sticky="w")
