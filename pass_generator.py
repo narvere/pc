@@ -6,7 +6,7 @@ dictionary = []
 
 def pass_gen():
     password = ""
-    with open('dictionary.txt') as f:
+    with open('C:/Users/7272/PycharmProjects/pc/dictionary.txt') as f:
         lines = f.readlines()
         for line in lines:
             line = ''.join(sorted(set(line), key=line.index))

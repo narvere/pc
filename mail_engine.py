@@ -16,8 +16,8 @@ def show_error(ex):
 
 
 def send_mail(email_receiver, clipboard_text):
-    print("Start!")
-    dotenv.load_dotenv('.env')
+    # print("Start!")
+    dotenv.load_dotenv('C:/Users/7272/PycharmProjects/pc/.env')
     email_sender = os.environ["EMAIL_SENDER"]
     email_password = os.environ["EMAIL_PASSWORD"]
     # email_receiver = os.environ["EMAIL_RECEIVER"]
@@ -29,15 +29,15 @@ def send_mail(email_receiver, clipboard_text):
     em['Subject'] = subject
     em.set_content(body)
     context = ssl.create_default_context()
-    print("Start1!")
+    # print("Start1!")
     # with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
     #     smtp.login(email_sender, email_password)
     #     smtp.sendmail(email_sender, email_receiver, em.as_string())
     #     print("Start2!")
-    print(os.environ["EMAIL_SENDER"])
+    # print(os.environ["EMAIL_SENDER"])
     try:
         with smtplib.SMTP_SSL(os.environ["MAIL_SERVER"], 465, context=context) as smtp:
-            print(email_sender, email_password)
+            # print(email_sender, email_password)
             smtp.login(user=email_sender, password=email_password)
             smtp.sendmail(from_addr=email_sender, to_addrs=[email_receiver, 'deniss.hohlov@narvahaigla.ee'],
                           msg=em.as_string())

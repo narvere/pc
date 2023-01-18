@@ -17,7 +17,7 @@ root.resizable(width=False, height=False)
 root.title(title)
 
 # Connect to the database
-conn = sqlite3.connect('database.db')
+conn = sqlite3.connect('C:/Users/7272/PycharmProjects/pc/database.db')
 cursor = conn.cursor()
 
 """
@@ -29,10 +29,11 @@ menu_bar = Menu(root)
 Создание экземпляра Frame и LabelFrame 
 """
 
-frame_left_entries = Frame(root)
-frame_right_setup = Frame(root)
-frame_keepass = LabelFrame(root, text=keepass_frame)
-frame_sms = LabelFrame(root, text=sms_frame)
+frame_left_entries = Frame(root, background="brown")
+frame_right_setup = Frame(root, background="purple")
+frame_keepass = LabelFrame(root, text=keepass_frame, background="red")
+frame_sms = LabelFrame(root, text=sms_frame, background="blue")
+frame_update = LabelFrame(root, text="Update old user", background="yellow")
 
 
 def del_text(*event):
@@ -50,6 +51,11 @@ def del_text(*event):
     entry_tht_code.delete(0, END)
     entry_phone.delete(0, END)
     entry_info.delete(0, END)
+    entry_zimbra_mail_upd.delete(0, END)
+    entry_zimbra_pass_upd.delete(0, END)
+    entry_ester_pass_upd.delete(0, END)
+    entry_arvuti_pass_upd.delete(0, END)
+    entry_pc_login_upd.delete(0, END)
 
 
 def error(err):
@@ -209,8 +215,19 @@ def generate_message_variables():
     # Generate passwords
     pc_pass, ester_pass, zimbra_pass = pass_gen()
 
-    # Generate spelling of first and last names
+    # If entered alternative PC password
+    if bool(entry_arvuti_pass_upd.get()):
+        pc_pass = entry_arvuti_pass_upd.get().strip()
 
+    # If entered alternative ester password
+    if bool(entry_ester_pass_upd.get()):
+        ester_pass = entry_ester_pass_upd.get().strip()
+
+    # If entered alternative Zimbra password
+    if bool(entry_zimbra_pass_upd.get()):
+        zimbra_pass = entry_zimbra_pass_upd.get().strip()
+
+    # Generate spelling of first and last names
     first_name_spelling = eesti_speller(entry_name.get().strip().lower().title())
     last_name_spelling = eesti_speller(entry_surname.get().strip().lower().title())
 
@@ -219,11 +236,26 @@ def generate_message_variables():
     last_surname = entry_surname.get().strip().lower().title()
 
     # Generate Zimbra email address
-    zimbra_mail = f"{first_name_spelling.lower()}.{last_name_spelling.lower()}{mail}"
+    zimbra_full_mail = f"{first_name_spelling.lower()}.{last_name_spelling.lower()}{mail}"
     zimbra_mail_sms = f"{first_name_spelling.lower()}.{last_name_spelling.lower()}"
 
+    # zimbra_full_mail = 1
+    # zimbra_mail_sms = "0"
+    # print(zimbra_full_mail, zimbra_mail_sms)
+
+    # If mail is changed. Influence to email in Keepass box
+    # if bool(entry_zimbra_mail_upd.get()):
+    #     zimbra_mail_sms = entry_zimbra_mail_upd.get().strip()
+
+    if bool(entry_zimbra_mail_upd.get()):
+        zimbra_full_mail = entry_zimbra_mail_upd.get().strip()
+        print(zimbra_full_mail)
+
     # Generate PC login
-    pc_login = entry_ester.get()[1:].strip().lower().title()
+    if bool(entry_pc_login_upd.get()):
+        pc_login = entry_pc_login_upd.get().strip().lower().title()
+    else:
+        pc_login = entry_ester.get()[1:].strip().lower().title()
 
     # Extract HEDA/Ester login
     ester_login = entry_ester.get()
@@ -241,16 +273,7 @@ def generate_message_variables():
     additional_info = entry_info.get()
     return additional_info, ester_login, ester_pass, first_name, first_name_spelling, \
         last_name_spelling, last_surname, pc_login, pc_pass, personal_id, phone_number, \
-        tht_code, zimbra_mail, zimbra_pass, zimbra_mail_sms
-
-
-# def show_error(ex):
-#     """
-#     Show message box as Exeption
-#     :param ex:
-#     :return:
-#     """
-#     messagebox.showerror("Error", ex)
+        tht_code, zimbra_full_mail, zimbra_pass, zimbra_mail_sms
 
 
 def creating_hotkeys():
@@ -370,9 +393,6 @@ def del_str(nr):
     conn.commit()
     fetching_data(frame_setup)
 
-    # Close the connection
-    # conn.close()
-
 
 def fetching_data(frame_setup):
     # Select all rows from the table
@@ -409,7 +429,7 @@ button_send_to_sms = Button(frame_sms, text=send_to_sms_button,
 
 button_enter = Button(frame_left_entries, text=enter_button, command=creating_user_text, underline=0)
 
-button_delete = Button(frame_left_entries, text=delete_all_button, command=del_text, underline=0)
+button_delete = Button(frame_update, text=delete_all_button, command=del_text, underline=0)
 style = Style()
 style.map('TButton',
           foreground=[('!active', 'purple'),
@@ -432,6 +452,11 @@ label_ik = Label(frame_left_entries, text=label_personal_id, width=12, anchor="w
 label_phone = Label(frame_left_entries, text=label_phone_number, width=12, anchor="w")
 label_info = Label(frame_left_entries, text=label_additional_info, width=12, anchor="w")
 label_tht_kood = Label(frame_left_entries, text=label_tht_code, width=12, anchor="w")
+label_arvuti_login = Label(frame_update, text="Arvuti login:", width=12, anchor="w")
+label_arvuti_pass = Label(frame_update, text="Arvuti pass:", width=12, anchor="w")
+label_ester_pass_upd = Label(frame_update, text="Ester pass:", width=12, anchor="w")
+label_zimbra_mail_upd = Label(frame_update, text="Zimbra mail:", width=12, anchor="w")
+label_zimbra_pass_upd = Label(frame_update, text="Zimbra pass:", width=12, anchor="w")
 
 """
 Создание экземпляра Text 
@@ -451,13 +476,20 @@ entry_personal_id = Entry(frame_left_entries)
 entry_tht_code = Entry(frame_left_entries)
 entry_phone = Entry(frame_left_entries)
 entry_info = Entry(frame_left_entries)
+entry_pc_login_upd = Entry(frame_update)
+entry_arvuti_pass_upd = Entry(frame_update)
+entry_ester_pass_upd = Entry(frame_update)
+entry_zimbra_mail_upd = Entry(frame_update)
+entry_zimbra_pass_upd = Entry(frame_update)
 
 # Ищем строку с определенным ID
-cursor.execute("SELECT * FROM users WHERE keepass=?", (1,))
-keepass = cursor.fetchone()
-cursor.execute("SELECT * FROM users WHERE sms=?", (1,))
-sms = cursor.fetchone()
-
+try:
+    cursor.execute("SELECT * FROM users WHERE keepass=?", (1,))
+    keepass = cursor.fetchone()
+    cursor.execute("SELECT * FROM users WHERE sms=?", (1,))
+    sms = cursor.fetchone()
+except(Exception):
+    pass
 if keepass or sms:
     entry_alex = Label(frame_keepass, text=keepass[1])
     entry_SMS = Label(frame_sms, text=sms[1])
@@ -465,15 +497,14 @@ else:
     entry_alex = Label(frame_keepass, text="None")
     entry_SMS = Label(frame_sms, text="None")
 
-
 # DEMO info
-# entry_name.insert(END, 'deniss')
-# entry_surname.insert(END, 'hohlov')
-# entry_ester.insert(END, 'a7272')
-# entry_personal_id.insert(END, '38410103729')
-# entry_tht_code.insert(END, 'd00077')
-# entry_phone.insert(END, '55944212')
-# entry_info.insert(END, 'it-mees')
+entry_name.insert(END, 'deniss')
+entry_surname.insert(END, 'hohlov')
+entry_ester.insert(END, 'a7272')
+entry_personal_id.insert(END, '38410103729')
+entry_tht_code.insert(END, 'd00077')
+entry_phone.insert(END, '55944212')
+entry_info.insert(END, 'it-mees')
 
 
 #
@@ -494,7 +525,23 @@ def left_frame():
     for i, entry in enumerate(entries):
         entry.grid(row=i, column=1, sticky="w", ipadx=entry_len)
     button_enter.grid(row=7, column=1, ipadx=15, ipady=5, pady=10)
-    button_delete.grid(row=0, column=2, padx=10)
+    button_delete.grid(row=5, column=0, padx=10, sticky="nw", pady=10)
+
+
+def update_frame():
+    frame_update.grid(row=0, column=1, columnspan=3, sticky="ne", pady=10, padx=10)
+
+    label_arvuti_login.grid(row=0, column=0, sticky="w")
+    label_arvuti_pass.grid(row=1, column=0, sticky="w")
+    label_ester_pass_upd.grid(row=2, column=0, sticky="w")
+    label_zimbra_mail_upd.grid(row=3, column=0, sticky="w")
+    label_zimbra_pass_upd.grid(row=4, column=0, sticky="w")
+
+    entry_pc_login_upd.grid(row=0, column=1, sticky="w")
+    entry_arvuti_pass_upd.grid(row=1, column=1, sticky="w")
+    entry_ester_pass_upd.grid(row=2, column=1, sticky="w")
+    entry_zimbra_mail_upd.grid(row=3, column=1, sticky="w")
+    entry_zimbra_pass_upd.grid(row=4, column=1, sticky="w")
 
 
 def fight_frame():
@@ -531,6 +578,7 @@ left_frame()
 fight_frame()
 keepass_frame()
 sms_frame()
+update_frame()
 
 
 def copy_to_clipboard(clipboard_text, *event):
