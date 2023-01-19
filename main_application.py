@@ -125,7 +125,7 @@ def clipboard_adding():
                              f"{last_name_speller} " \
                              f"\n{clipboard_SMS_txt}\n{label_personal_id}{personal_id}\n" \
                              f"{label_tht_code}{tht_code}\n" \
-                             f"{label_phone_number}{phone_number}\n{label_additional_info}{additional_info}"
+                             f"{label_additional_info}{additional_info}"
     return ester_pass, first_name, first_name_speller, last_name_speller, \
         last_surname, pc_login, pc_pass, zimbra_mail, zimbra_pass
 
@@ -404,11 +404,11 @@ def fetching_data(frame_setup):
     # Print the rows
     for row in rows:
         mail = row[1]
-        keepass = row[2]
-        sms = row[3]
+        keepass_checkbox = row[2]
+        sms_checkbox = row[3]
 
         # label_add_mail = Label(frame_setup, text=f"{entry_string}, {checkbox1_state_keepass}, {checkbox2_state_sms}")
-        label_add_mail = Label(frame_setup, text=f"{mail}, KeePass - {keepass}, SMS - {sms}")
+        label_add_mail = Label(frame_setup, text=f"{mail}, KeePass - {keepass_checkbox}, SMS - {sms_checkbox}")
         label_add_mail.grid(row=row[0], column=0, sticky="w")
         xxx = Button(frame_setup, text="Del", command=lambda id=row[0]: del_str(id))
         xxx.grid(row=row[0], column=1)
@@ -424,6 +424,8 @@ button_copy_to_sms = Button(frame_sms, text=copy_to_sms_button, command=lambda: 
 
 button_send_to_alex = Button(frame_keepass, text=send_to_alex_button,
                              command=lambda: send_mail(keepass[1], clipboard_keepass_text))
+button_send_to_deniss = Button(frame_keepass, text=send_to_alex_deniss,
+                             command=lambda: send_mail(mail_to_deniss, clipboard_keepass_text))
 button_send_to_sms = Button(frame_sms, text=send_to_sms_button,
                             command=lambda: send_mail(sms[1], clipboard_SMS_txt))
 
@@ -569,9 +571,10 @@ def keepass_frame():
     """
     frame_keepass.grid(row=4, column=0, columnspan=3, padx=10)
     text_text.grid(row=0, column=0, rowspan=11, sticky="we")
-    button_send_to_alex.grid(row=1, column=1, ipadx=10, ipady=5, sticky="we")
     button_copy_to_alex.grid(row=0, column=1, ipadx=10, ipady=5, sticky="we")
+    button_send_to_alex.grid(row=1, column=1, ipadx=10, ipady=5, sticky="we")
     entry_alex.grid(row=2, column=1, sticky="we", padx=10)
+    button_send_to_deniss.grid(row=3, column=1, ipadx=10, ipady=5, sticky="we")
 
 
 def sms_frame():

