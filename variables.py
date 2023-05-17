@@ -1,5 +1,5 @@
 # pip install pyinstaller
-# pyinstaller main_application.py
+# pyinstaller -F main_application.py
 
 # Constants for input fields
 text_width = 50

@@ -17,10 +17,9 @@ def show_error(ex):
 
 def send_mail(email_receiver, clipboard_text):
     # print("Start!")
-    dotenv.load_dotenv('C:/Users/7272/PycharmProjects/pc/.env')
+    dotenv.load_dotenv(r'C:\Users\7272\Desktop\PycharmProjects\pc\.env')
     email_sender = os.environ["EMAIL_SENDER"]
     email_password = os.environ["EMAIL_PASSWORD"]
-    # email_receiver = os.environ["EMAIL_RECEIVER"]
     subject = "A new user password"
     body = clipboard_text
     em = EmailMessage()

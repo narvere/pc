@@ -17,7 +17,7 @@ root.resizable(width=False, height=False)
 root.title(title)
 
 # Connect to the database
-conn = sqlite3.connect('C:/Users/7272/PycharmProjects/pc/database.db')
+conn = sqlite3.connect(r'C:\Users\7272\Desktop\PycharmProjects\pc\database.db')
 cursor = conn.cursor()
 
 """
@@ -83,9 +83,10 @@ def creating_user_text(*event):
     if not entry_ester.get().strip().isalnum():
         error(label_ester_login)
         return 0
-    if not ikood(entry_personal_id.get().strip()):
-        error(label_personal_id)
-        return 0
+    if bool(entry_personal_id.get().strip()):
+        if not ikood(entry_personal_id.get().strip()):
+            error(label_personal_id)
+            return 0
     if not bool(entry_phone.get().strip()):
         error(label_phone_number)
         return 0
